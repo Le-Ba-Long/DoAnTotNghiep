@@ -1,7 +1,7 @@
 # DoAnTotNghiep
 3.1. Giao diện chương trình
 3.1.1. Giao diện đăng nhập
-  ![My cat](https://www.dropbox.com/s/2khr96kjl9hzq8x/Anh_1.png?dl=0)
+  ![My cat]([https://www.dropbox.com/s/2khr96kjl9hzq8x/Anh_1.png?dl=0](https://lh3.googleusercontent.com/p/AF1QipOcQojaLL-fPF38UbDvvGcZxVO0tU3y-Ps_XvPK=s680-w680-h510))
 3.1.2. Giao diện trang trủ. 
   ![My cat](https://www.dropbox.com/s/ydd8hly2z10iwux/Anh_2.png?dl=0)
 3.1.3. Giao diện quản lí tuyển dụng.
