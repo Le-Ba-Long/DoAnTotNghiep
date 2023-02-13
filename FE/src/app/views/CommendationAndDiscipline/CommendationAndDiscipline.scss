@@ -1,0 +1,17 @@
+.dotted {
+  .MuiInputBase-root {
+    .MuiInputBase-input {
+      background-attachment: local;
+      background-image: linear-gradient(to right, transparent 10px, transparent 10px),
+        linear-gradient(to left, transparent 10px, transparent 10px),
+        repeating-linear-gradient(transparent, transparent 30px, #ccc 30px, transparent 31px);
+      line-height: 31px;
+      &:hover,
+      &:focus {
+        background-image: linear-gradient(to right, transparent 10px, transparent 10px),
+          linear-gradient(to left, transparent 10px, transparent 10px),
+          repeating-linear-gradient(transparent, transparent 30px, #000 30px, transparent 31px);
+      }
+    }
+  }
+}

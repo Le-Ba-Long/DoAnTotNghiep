@@ -1,0 +1,20 @@
+.pd-60 {
+  padding-left: 60px !important;
+}
+.mr-10 {
+  margin-right: 10px;
+}
+.fw-600 {
+  font-weight: 600;
+}
+.table {
+  border-spacing: 0;
+  th,
+  td {
+    border: 1px solid #bbb;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 100px;
+  }
+}

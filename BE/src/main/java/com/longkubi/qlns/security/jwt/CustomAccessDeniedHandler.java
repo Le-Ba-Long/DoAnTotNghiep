@@ -1,0 +1,20 @@
+package com.longkubi.qlns.security.jwt;
+
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.access.AccessDeniedHandler;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+public class CustomAccessDeniedHandler implements AccessDeniedHandler {
+    @Override
+    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException exc)
+            throws IOException, ServletException {
+   // Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        response.setContentType("text/html; charset=UTF-8");
+        response.getWriter().write("Bạn Không Có Quyền Truy Cập Vào Đường Dẫn Này");
+    }
+}
