@@ -1,49 +1,63 @@
 # DoAnTotNghiep
 3.1. Giao diện chương trình
 3.1.1. Giao diện đăng nhập
-  ![My cat]([https://www.dropbox.com/s/2khr96kjl9hzq8x/Anh_1.png?dl=0](https://lh3.googleusercontent.com/p/AF1QipOcQojaLL-fPF38UbDvvGcZxVO0tU3y-Ps_XvPK=s680-w680-h510))
+ ![Anh_1](https://user-images.githubusercontent.com/88453655/218537503-38dbb6a5-e530-41ae-b817-81d00fc44e15.png)
 3.1.2. Giao diện trang trủ. 
-  ![My cat](https://www.dropbox.com/s/ydd8hly2z10iwux/Anh_2.png?dl=0)
+![Anh_2](https://user-images.githubusercontent.com/88453655/218537654-0ba70a97-e22f-4170-98d4-fcc15c2fcb2e.png)
 3.1.3. Giao diện quản lí tuyển dụng.
-  ![My cat](https://www.dropbox.com/s/rvhfu2ov3ihdf04/Anh_3.png?dl=0)
+ ![Anh_3](https://user-images.githubusercontent.com/88453655/218537763-6f8f617e-8358-48dd-9d57-0bba0714b694.png)
+
 Giao diện quản lí tuyển dụng
-  ![My cat](https://www.dropbox.com/s/ksgnsm1t4dd0npd/Anh_4.png?dl=0)
+ ![Anh_4](https://user-images.githubusercontent.com/88453655/218537802-2c93c611-02bc-4f5a-bd23-274beb066865.png)
 Chi tiết Job tuyển dụng
 3.1.4. Giao diện quản lí hồ sơ ứng viên
-  ![My cat](https://www.dropbox.com/s/7ata8m6l6hd1qs8/Anh_5.png?dl=0)
+![Anh_5](https://user-images.githubusercontent.com/88453655/218537869-249021e6-b3b1-4a77-83f3-d66c90a6ab1c.png)
 Giao diện quản lí hồ sơ ứng viên
-  ![My cat](https://www.dropbox.com/s/f32f93hzhgfxkyr/Anh_6.png?dl=0)
+![Anh_6](https://user-images.githubusercontent.com/88453655/218537982-91dfc838-1a23-4b93-b493-01bd1fe0a89e.png)
+
 Giao diện chi tiết hồ sơ ứng viên
 3.1.5. Giao diện quản lí danh mục
-  ![My cat](https://www.dropbox.com/s/fra02lp5tjo387l/Anh_7.png?dl=0)
+ ![Anh_7](https://user-images.githubusercontent.com/88453655/218538032-1047c1c0-c298-4ce3-a73a-3805a14a22cd.png)
+
 Giao diện danh sách phòng ban
 3.1.6. Giao diện quản lí phê duyệt
-  ![My cat](https://www.dropbox.com/s/mun0ahtiozo0ig7/Anh_8.png?dl=0)
+ ![Anh_8](https://user-images.githubusercontent.com/88453655/218538060-08f978e2-8e9d-4cdf-93fe-89119ff224c5.png)
+
 Giao diện phê duyệt kế hoạch tuyển dụng
-![My cat](https://www.dropbox.com/s/d2tgnlc8k1ghj6t/Anh_9.png?dl=0)
+![Anh_9](https://user-images.githubusercontent.com/88453655/218538104-cc9c055d-a3bf-45d5-acbd-8dd51bc64507.png)
+
 Giao diện danh sách các kế hoạch đã được phê duyệt
-   ![My cat](https://www.dropbox.com/s/09ei8v3ke2uwzh5/Anh_10.png?dl=0)
+  ![Anh_10](https://user-images.githubusercontent.com/88453655/218538161-2bf32185-9ee8-445c-8d30-0c84168a5d0e.png)
 Giao diện phê duyệt hồ sơ ứng viên
-![My cat](https://www.dropbox.com/s/nhi6xy7te1xxf3c/Anh_11.png?dl=0)
+![Anh_11](https://user-images.githubusercontent.com/88453655/218538245-a9e06db4-b174-464d-9c81-6be4b005a7cf.png)
+
 Giao diện phê duyệt hồ sơ nhân viên
-   ![My cat](https://www.dropbox.com/s/q5359gd1o5jgvqe/Anh_12.png?dl=0)
+ ![Anh_12](https://user-images.githubusercontent.com/88453655/218538264-944e562f-cc9a-4bd0-b377-8aae00505fc6.png)
+
 Giao diện tạo quyết định khen thưởng và kỉ luật cho nhân viên
  3.1.7 Giao diện quản lí nhân viên.
-  ![My cat](https://www.dropbox.com/s/yvhicnmenh12qd0/Anh_13.png?dl=0)
+  ![Anh_13](https://user-images.githubusercontent.com/88453655/218538282-edab6071-5a13-4ae7-9219-3442a2fec7c4.png)
+
 Danh sách chấm công nhân viên
-  ![My cat](https://www.dropbox.com/s/4a8yiye25ra0cm6/Anh_14.png?dl=0)
+ 
+![Anh_14](https://user-images.githubusercontent.com/88453655/218538333-0b35157b-f643-497b-baa3-03a5bbddf965.png)
 
 Danh sách tạo hồ sơ nhân viên
-  ![My cat](https://www.dropbox.com/s/0c1o949770nvxfq/Anh_15.png?dl=0)
+  ![Anh_15](https://user-images.githubusercontent.com/88453655/218538380-27beb793-5a3b-4ffe-93f4-8ce36d9106fa.png)
+
 Giao diện cập nhập diễn biến nhân viên
 
 3.1.8.  Giao diện quản lí lương nhân viên
- ![My cat](https://www.dropbox.com/s/436cirmf3gl4qte/Anh_16.png?dl=0)
+![Anh_16](https://user-images.githubusercontent.com/88453655/218538426-375d8313-5e9e-4345-95cb-4b143cb32101.png)
+
 3.1.9 Giao diện quản lí hợp đồng
-   ![My cat](https://www.dropbox.com/s/d5c5df6l7lvkc9j/Anh_17.png?dl=0)
+   ![Anh_17](https://user-images.githubusercontent.com/88453655/218538450-d63afb26-e72c-43aa-a51f-7f29e7989e33.png)
+
 Giao diện quản lí  hợp đồng
 3.1.10 Giao diện quản lí người dùng 
-![My cat](https://www.dropbox.com/s/t4p2kk2vhwdjf1r/Anh_18.png?dl=0)
+![Anh_18](https://user-images.githubusercontent.com/88453655/218538490-5f8ad080-f885-43ee-9af7-b789b8cd786d.png)
+
 Giao diện quản lí người dùng
 
  
+
