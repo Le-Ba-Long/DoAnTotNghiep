@@ -2,15 +2,17 @@ package com.longkubi.qlns.service.impl;
 
 import com.longkubi.qlns.common.Constant;
 import com.longkubi.qlns.common.ErrorMessage;
-import com.longkubi.qlns.model.dto.ContractDto;
-import com.longkubi.qlns.model.dto.EmployeeDto;
-import com.longkubi.qlns.model.dto.PositionDto;
-import com.longkubi.qlns.model.dto.ResponseData;
+import com.longkubi.qlns.model.dto.*;
 import com.longkubi.qlns.model.dto.search.EmployeeSearchDto;
 import com.longkubi.qlns.model.entity.*;
+import com.longkubi.qlns.repository.CandidateProfileRepository;
+import com.longkubi.qlns.repository.EmployeeHistoryRepository;
 import com.longkubi.qlns.repository.EmployeeRepository;
 import com.longkubi.qlns.security.jwt.JwtProvider;
-import com.longkubi.qlns.service.*;
+import com.longkubi.qlns.service.IContractService;
+import com.longkubi.qlns.service.IDepartmentService;
+import com.longkubi.qlns.service.IEmployeeService;
+import com.longkubi.qlns.service.IPositionService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,9 +25,14 @@ import org.springframework.util.StringUtils;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.YearMonth;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.longkubi.qlns.common.Constant.StatusType.*;
+import static com.longkubi.qlns.common.Constant.StatusType.PASS;
 import static com.longkubi.qlns.common.ErrorMessage.*;
 
 @Transactional
@@ -40,7 +47,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
     private IDepartmentService departmentService;
 
     @Autowired
-    private ICertificateService certificateService;
+    private CandidateProfileRepository candidateProfileRepository;
 
     @Autowired
     private IContractService contractService;
@@ -52,6 +59,8 @@ public class EmployeeServiceImpl implements IEmployeeService {
 
     @Autowired
     private EntityManager manager;
+    @Autowired
+    private EmployeeHistoryRepository employeeHistoryRepository;
 
     @Override
     public ResponseData<EmployeeDto> create(EmployeeDto employeeDto, String token) {
@@ -59,6 +68,11 @@ public class EmployeeServiceImpl implements IEmployeeService {
         if (!errorMessage.equals(SUCCESS)) return new ResponseData<>(errorMessage, null);
         Employee entity = new Employee();
         modelMapper.map(employeeDto, entity);
+        CandidateProfile candidateProfile = candidateProfileRepository.getCandidateProfileById(employeeDto.getCandidateProfileDto().getId());
+        // khi chuyển hồ sơ sang nhân viên sẽ set lại hồ sơ ứng viên với trạng thái là chuyển hồ sơ ứng viên
+        candidateProfile.setStatus(CANDIDATE_PROFILE_CONVERSION.getType());
+        candidateProfile = candidateProfileRepository.save(candidateProfile);
+        entity.setCandidateProfile(candidateProfile);
         entity.setCreator(jwtProvider.getUserNameFromToken(token));
         entity.setDateCreated(new Date());
         return new ResponseData<>(modelMapper.map(repo.save(entity), EmployeeDto.class));
@@ -98,9 +112,11 @@ public class EmployeeServiceImpl implements IEmployeeService {
         entity.setAdditionalRequestContent(employeeDto.getAdditionalRequestContent());
         entity.setImage(employeeDto.getImage());
         entity.setImageName(employeeDto.getImageName());
-        if(!Objects.isNull(employeeDto.getContract())) {
+        if (!Objects.isNull(employeeDto.getContract())) {
             entity.setContract(modelMapper.map(employeeDto.getContract(), Contract.class));
         }
+
+
 //        if (!Objects.isNull(employeeDto.getContract())) {
 //            ResponseData<ContractDto> contract = contractService.create(employeeDto.getContract(), token);
 //            entity.setContract(modelMapper.map(contractService.getContractById(contract.getData().getId()), Contract.class));
@@ -110,27 +126,110 @@ public class EmployeeServiceImpl implements IEmployeeService {
             listIdPosition.add(position.getId());
         }
         //  employeeDto.getPositions().stream().forEach(position -> listIdPosition.add(position.getId()));
-        entity.setPositions(positionService.getPositionByListId(listIdPosition).stream()
-                .map(position -> modelMapper.map(position, Position.class)).collect(Collectors.toSet()));
+        entity.setPositions(positionService.getPositionByListId(listIdPosition).stream().map(position -> modelMapper.map(position, Position.class)).collect(Collectors.toSet()));
         entity.setDepartment(modelMapper.map(employeeDto.getDepartment(), Department.class));
         entity.setCertificate(modelMapper.map(employeeDto.getCertificate(), Certificate.class));
         return new ResponseData<>(modelMapper.map(repo.save(entity), EmployeeDto.class));
     }
 
+//    private void insertEmployeeHistory(EmployeeDto employeeDto) {
+//        EmployeeHistory employeeHistory = new EmployeeHistory();
+//        if (employeeDto.getStatus() == TRY_JOB.getType()) {
+//            employeeHistory.setDate(new Date());
+//            employeeHistory.setEvent("Băt Đầu Thử việc : ");
+//            employeeHistory.setStatus(CANDIDATE_PROFILE_CONVERSION.getType());//chuyển hồ sơ ứng viên khi đậu phỏng vấn sang hồ sơ nhân viên
+//        }
+//        employeeHistoryRepository.save(employeeHistory);
+//    }
+
     @Override
     public ResponseData<List<EmployeeDto>> getAll() {
-       // List<Employee> employeeDtos = repo.findAll();
+        // List<Employee> employeeDtos = repo.findAll();
         List<Employee> employeeDtos = repo.getAll();
         if (employeeDtos.isEmpty()) return new ResponseData<>(SUCCESS, new ArrayList<>());
         return new ResponseData<>(employeeDtos.stream().map(dto -> modelMapper.map(dto, EmployeeDto.class)).collect(Collectors.toList()));
     }
 
-    @Override
+    @Override//lấy ra tất cả nhân viên không có hợp đồng
     public ResponseData<List<EmployeeDto>> getEmployeesWithoutContract() {
-         List<Employee> employeeDtos = repo.getEmployeesWithoutContract();
+        List<Employee> employeeDtos = repo.getEmployeesWithoutContract();
         if (employeeDtos.isEmpty()) return new ResponseData<>(SUCCESS, new ArrayList<>());
         return new ResponseData<>(employeeDtos.stream().map(dto -> modelMapper.map(dto, EmployeeDto.class)).collect(Collectors.toList()));
 
+    }
+
+    @Override
+    // public ResponseData<Map<YearMonth, Integer>> getPersonnelChangeReport() {
+    public ResponseData<List<PersonnelChangeReport>> getPersonnelChangeReport() {
+        List<PersonnelChangeReport> finalResult = new ArrayList<>();
+        Map<YearMonth, Integer> personnelRecruitmentReport = new TreeMap<>();
+        Map<YearMonth, Integer> personnelAttritionReport = new TreeMap<>();
+        List<Object[]> resultReceive = repo.personnelRecruitmentReport();
+        List<Object[]> resultReject = repo.personnelAttritionReport();
+
+        convertListToMap(personnelRecruitmentReport, resultReceive);
+        convertListToMap(personnelAttritionReport, resultReject);
+        LocalDate currentDate = LocalDate.now();
+        int currentYear = currentDate.getYear();
+
+        for (int month = 1; month <= 12; month++) {
+            YearMonth yearMonth = YearMonth.of(currentYear, month);
+            if (!personnelRecruitmentReport.containsKey(yearMonth)) {
+                personnelRecruitmentReport.put(yearMonth, 0);
+            }
+            if (!personnelAttritionReport.containsKey(yearMonth)) {
+                personnelAttritionReport.put(yearMonth, 0);
+            }
+        }
+        List<Integer> valuesReceive = new ArrayList<>(personnelRecruitmentReport.values());
+        List<Integer> valuesReject = new ArrayList<>(personnelAttritionReport.values());
+        finalResult.add(new PersonnelChangeReport("Tiếp Nhận", valuesReceive));
+        finalResult.add(new PersonnelChangeReport("Từ Chối", valuesReject));
+        return new ResponseData<>(finalResult);
+    }
+
+    @Override
+    public ResponseData<List<PersonnelChangeReport>> getMonthlyEmployeeCountReport() {
+        List<PersonnelChangeReport> finalResult = new ArrayList<>();
+        Map<YearMonth, Integer> monthlyEmployeeCountReport = new TreeMap<>();
+        List<Object[]> totalEmployee = repo.monthlyEmployeeCountReport();
+        convertListToMap(monthlyEmployeeCountReport, totalEmployee);
+        LocalDate currentDate = LocalDate.now();
+        int currentYear = currentDate.getYear();
+
+        for (int month = 1; month <= 12; month++) {
+            YearMonth yearMonth = YearMonth.of(currentYear, month);
+            if (!monthlyEmployeeCountReport.containsKey(yearMonth)) {
+                monthlyEmployeeCountReport.put(yearMonth, 0);
+            }
+        }
+        List<Integer> values = new ArrayList<>(monthlyEmployeeCountReport.values());
+        finalResult.add(new PersonnelChangeReport("Tổng Nhân Viên", values));
+        return new ResponseData<>(finalResult);
+    }
+
+    @Override
+    public ResponseData<List<PersonnelChangeReport>> getEmployeeCountByDepartment() {
+        List<PersonnelChangeReport> finalResult = new ArrayList<>();
+        List<Object[]> totalEmployee = repo.getEmployeeCountByDepartment();
+        for (Object[] value : totalEmployee) {
+            PersonnelChangeReport report = new PersonnelChangeReport();
+            report.setName((String) value[0]);
+            report.setCount(((Number) value[1]).intValue());
+            finalResult.add(report);
+        }
+
+        return new ResponseData<>(finalResult);
+    }
+
+    private void convertListToMap(Map<YearMonth, Integer> personnelRecruitmentReport, List<Object[]> resultQuery) {
+        for (Object[] result : resultQuery) {
+            Integer month = (Integer) result[0];
+            Integer year = (Integer) result[1];
+            Integer count = ((Number) result[2]).intValue();
+            YearMonth yearMonth = YearMonth.of(year, month);
+            personnelRecruitmentReport.put(yearMonth, count);
+        }
     }
 
     /**

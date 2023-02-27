@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { MenuItem } from '@mui/material';
-import { sex } from 'app/constant';
+import React, { useState, useEffect } from "react";
+import Grid from "@mui/material/Grid";
+import TextField from "@mui/material/TextField";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { MenuItem } from "@mui/material";
+import { sex } from "app/constant";
+import { uploadImage } from "app/constant";
+import AddIcon from "@mui/icons-material/Add";
+import "./EmployeeView.scss";
 
 export default function EmployeeInformation(props) {
   const { formik } = props;
@@ -36,7 +39,7 @@ export default function EmployeeInformation(props) {
             helperText={formik.errors.fullName}
           />
         </Grid>
-        <Grid item xs={3} md={3}>
+        <Grid item xs={2} md={2}>
           <LocalizationProvider dateAdapter={AdapterDayjs} fullWidth>
             <DatePicker
               label="Ngày sinh"
@@ -45,7 +48,7 @@ export default function EmployeeInformation(props) {
               value={formik.values?.dateOfBirth}
               onChange={(value) => {
                 if (value) {
-                  formik.setFieldValue('dateOfBirth', new Date(value));
+                  formik.setFieldValue("dateOfBirth", new Date(value));
                 }
               }}
               renderInput={(params) => {
@@ -56,7 +59,9 @@ export default function EmployeeInformation(props) {
                     type="date"
                     fullWidth
                     variant="outlined"
-                    error={formik.errors.dateOfBirth && formik.touched.dateOfBirth}
+                    error={
+                      formik.errors.dateOfBirth && formik.touched.dateOfBirth
+                    }
                     helperText={formik.errors.dateOfBirth}
                   />
                 );
@@ -64,7 +69,7 @@ export default function EmployeeInformation(props) {
             />
           </LocalizationProvider>
         </Grid>
-        <Grid item xs={3} md={3}>
+        <Grid item xs={2} md={2}>
           <TextField
             label="Giới tính"
             variant="outlined"
@@ -80,6 +85,32 @@ export default function EmployeeInformation(props) {
               <MenuItem value={item.name}>{item.name}</MenuItem>
             ))}
           </TextField>
+        </Grid>
+        <Grid item xs={2} md={2}>
+          <TextField
+            label="Ảnh ứng viên"
+            type="text"
+            style={{ width: "82%" }}
+            name="imageName"
+            value={formik.values?.imageName}
+            InputLabelProps={{ shrink: true }}
+            inputProps={{ accept: "image/*" }}
+          />
+          <label for="file-upload" className="custom-file-upload">
+            <AddIcon />
+          </label>
+          <input
+            type="file"
+            id="file-upload"
+            className="filename"
+            onChange={(event) => {
+              console.log(event.currentTarget.files[0]);
+              uploadImage(event.currentTarget.files[0]).then((res) => {
+                formik.setFieldValue("image", res?.data?.fileDownloadUri);
+                formik.setFieldValue("imageName", res?.data?.fileName);
+              });
+            }}
+          ></input>
         </Grid>
       </Grid>
       <Grid container item xs={12} md={12} spacing={2}>
@@ -141,7 +172,10 @@ export default function EmployeeInformation(props) {
             name="numberIdentityCard"
             value={formik.values?.numberIdentityCard}
             onChange={formik.handleChange}
-            error={formik.errors.numberIdentityCard && formik.touched.numberIdentityCard}
+            error={
+              formik.errors.numberIdentityCard &&
+              formik.touched.numberIdentityCard
+            }
             helperText={formik.errors.numberIdentityCard}
           />
         </Grid>
@@ -154,7 +188,10 @@ export default function EmployeeInformation(props) {
               value={formik.values?.issuedDateIdentityCard || null}
               onChange={(value) => {
                 if (value) {
-                  formik.setFieldValue('issuedDateIdentityCard', new Date(value));
+                  formik.setFieldValue(
+                    "issuedDateIdentityCard",
+                    new Date(value)
+                  );
                 }
               }}
               renderInput={(params) => {
@@ -166,7 +203,8 @@ export default function EmployeeInformation(props) {
                     fullWidth
                     variant="outlined"
                     error={
-                      formik.errors.issuedDateIdentityCard && formik.touched.issuedDateIdentityCard
+                      formik.errors.issuedDateIdentityCard &&
+                      formik.touched.issuedDateIdentityCard
                     }
                     helperText={formik.errors.issuedDateIdentityCard}
                   />
@@ -184,7 +222,8 @@ export default function EmployeeInformation(props) {
             value={formik.values?.placeOfGrantIdentityCard}
             onChange={formik.handleChange}
             error={
-              formik.errors.placeOfGrantIdentityCard && formik.touched.placeOfGrantIdentityCard
+              formik.errors.placeOfGrantIdentityCard &&
+              formik.touched.placeOfGrantIdentityCard
             }
             helperText={formik.errors.placeOfGrantIdentityCard}
           />

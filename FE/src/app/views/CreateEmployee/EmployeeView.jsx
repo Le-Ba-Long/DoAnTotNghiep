@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import IconButton from '@mui/material/IconButton';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import CloseIcon from '@mui/icons-material/Close';
-import moment from 'moment';
-import { editEmployee } from './EmployeeService';
-import ConfirmationDialog from '../../components/ConfirmationDialog';
-import './EmployeeView.scss';
-import { toast } from 'react-toastify';
+import React, { useState, useEffect } from "react";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import CloseIcon from "@mui/icons-material/Close";
+import moment from "moment";
+import { editEmployee } from "./EmployeeService";
+import ConfirmationDialog from "../../components/ConfirmationDialog";
+import "./EmployeeView.scss";
+import { toast } from "react-toastify";
 
 export default function EmployeeView(props) {
   const { open, handleClose, item, setItem } = props;
@@ -25,20 +25,20 @@ export default function EmployeeView(props) {
       editEmployee(item)
         .then((res) => {
           if (res.data.statusCode === 200) {
-            toast.success('Hồ sơ đã được trình lên lãnh đạo');
+            toast.success("Hồ sơ đã được trình lên lãnh đạo");
             handleClose();
           } else {
-            toast.warning('Lỗi xác thực');
+            toast.warning("Lỗi xác thực");
             handleClose();
           }
         })
-        .catch((err) => toast.error('Có lỗi xảy ra'));
+        .catch((err) => toast.error("Có lỗi xảy ra"));
     }
   }, [item.status]);
 
   return (
     <>
-      <Dialog open={open} fullWidth maxWidth={'md'}>
+      <Dialog open={open} fullWidth maxWidth={"md"}>
         <DialogTitle>
           <Box className="icon-close" onClick={handleClose}>
             <IconButton color="error">
@@ -46,68 +46,74 @@ export default function EmployeeView(props) {
             </IconButton>
           </Box>
         </DialogTitle>
-        <DialogContent style={{ padding: '30px 20px 30px' }}>
+        <DialogContent style={{ padding: "30px 60px 30px" }}>
           <Grid
             container
             spacing={2}
-            style={{ fontFamily: '"Times New Roman", Times, serif', fontSize: '18px' }}
+            style={{
+              fontFamily: '"Times New Roman", Times, serif',
+              fontSize: "18px",
+            }}
           >
             <Grid
               item
               container
               xs={12}
-              style={{ fontSize: '30px', marginBottom: 40 }}
+              style={{ fontSize: "30px", marginBottom: 40 }}
               alignItems="center"
               justifyContent="center"
             >
               Hồ sơ nhân viên
             </Grid>
             <Grid item container xs={8} className="pd-60" spacing={1}>
-              <Grid item container xs={6}>
-                <Grid item className="fw-600 mr-10">
+              <Grid item container xs={12} className="fw-600">
+                I .THÔNG TIN CÁ NHÂN
+              </Grid>
+              <Grid item container xs={12} className="ml-10">
+                <Grid item xs={5} className="fw-600 ">
                   Mã nhân viên:
                 </Grid>
-                <Grid item xs={5}>
+                <Grid item xs={6}>
                   {item?.code}
                 </Grid>
               </Grid>
-              <Grid item container xs={6}>
-                <Grid item className="fw-600 mr-10">
+              <Grid item container xs={12} className="ml-10">
+                <Grid item xs={5} className="fw-600">
                   Họ và Tên:
                 </Grid>
-                <Grid item xs={7}>
+                <Grid item xs={6}>
                   {item?.fullName}
                 </Grid>
               </Grid>
-              <Grid item container xs={6}>
-                <Grid item className="fw-600 mr-10">
+              <Grid item container xs={12} className="ml-10">
+                <Grid item xs={5} className="fw-600">
                   Giới tính:
                 </Grid>
-                <Grid item xs={7}>
+                <Grid item xs={6}>
                   {item?.sex}
                 </Grid>
               </Grid>
-              <Grid item container xs={6}>
-                <Grid item className="fw-600 mr-10">
+              <Grid item container xs={12} className="ml-10">
+                <Grid item xs={5} className="fw-600">
                   Ngày sinh:
                 </Grid>
-                <Grid item xs={5}>
-                  {moment(item?.dateOfBirth).format('DD/MM/YYYY')}
+                <Grid item xs={6}>
+                  {moment(item?.dateOfBirth).format("DD/MM/YYYY")}
                 </Grid>
               </Grid>
-              <Grid item container xs={6}>
-                <Grid item className="fw-600 mr-10">
+              <Grid item container xs={12} className="ml-10">
+                <Grid item xs={5} className="fw-600">
                   Email:
                 </Grid>
-                <Grid item xs={7}>
+                <Grid item xs={6}>
                   {item?.email}
                 </Grid>
               </Grid>
-              <Grid item container xs={6}>
-                <Grid item className="fw-600 mr-10">
+              <Grid item container xs={12} className="ml-10">
+                <Grid item xs={5} className="fw-600">
                   SĐT:
                 </Grid>
-                <Grid item xs={7}>
+                <Grid item xs={6}>
                   {item?.phone}
                 </Grid>
               </Grid>
@@ -124,43 +130,35 @@ export default function EmployeeView(props) {
                 <img
                   src={item?.image}
                   alt=""
-                  style={{ height: '150px', border: '1px solid #000' }}
+                  style={{ height: "210px", border: "1px solid #000" }}
                 />
               ) : (
                 <img
                   src="https://icons.veryicon.com/png/o/internet--web/55-common-web-icons/person-4.png"
                   alt=""
-                  style={{ height: '150px', border: '1px solid #000' }}
+                  style={{ height: "210px", border: "1px solid #000" }}
                 />
               )}
             </Grid>
-            <Grid item container xs={12} className="pd-60" spacing={1}>
-              <Grid item className="fw-600 mr-10">
+            <Grid
+              item
+              container
+              xs={12}
+              className="pd-60"
+              spacing={1}
+              style={{ marginLeft: 2 }}
+            >
+              <Grid item xs={2} className="fw-600 mr-10">
                 Địa chỉ:
               </Grid>
-              <Grid item xs={7}>
+              <Grid item xs={9} style={{ marginLeft: 40 }}>
                 {item?.address}
               </Grid>
             </Grid>
-            <Grid item container xs={12} className="pd-60" spacing={1}>
-              <Grid item container xs={6}>
-                <Grid item className="fw-600 mr-10">
-                  Trình độ học vấn:
-                </Grid>
-                <Grid item xs={7}>
-                  {item?.education}
-                </Grid>
-              </Grid>
-              <Grid item container xs={6}>
-                <Grid item className="fw-600 mr-10">
-                  Chuyên ngành:
-                </Grid>
-                <Grid item xs={7}>
-                  {item?.major}
-                </Grid>
-              </Grid>
+            <Grid item container xs={12} className="pd-60 fw-600">
+              II. THÔNG TIN LIÊN QUAN
             </Grid>
-            <Grid item container xs={12} className="pd-60" spacing={1}>
+            <Grid item container xs={12} className="pd-60 ml-10" spacing={1}>
               <Grid item container xs={6}>
                 <Grid item className="fw-600 mr-10">
                   Số CCCD:
@@ -174,11 +172,11 @@ export default function EmployeeView(props) {
                   Ngày cấp:
                 </Grid>
                 <Grid item xs={7}>
-                  {moment(item?.issuedDateIdentityCard).format('DD/MM/YYYY')}
+                  {moment(item?.issuedDateIdentityCard).format("DD/MM/YYYY")}
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item container xs={12} className="pd-60" spacing={1}>
+            <Grid item container xs={12} className="pd-60 ml-10" spacing={1}>
               <Grid item container xs={12}>
                 <Grid item className="fw-600 mr-10">
                   Nơi cấp:
@@ -187,7 +185,7 @@ export default function EmployeeView(props) {
                   {item?.placeOfGrantIdentityCard}
                 </Grid>
               </Grid>
-              <Grid item container xs={4}>
+              <Grid item container xs={6}>
                 <Grid item className="fw-600 mr-10">
                   Dân tộc:
                 </Grid>
@@ -195,7 +193,7 @@ export default function EmployeeView(props) {
                   {item?.nation}
                 </Grid>
               </Grid>
-              <Grid item container xs={4}>
+              <Grid item container xs={6}>
                 <Grid item className="fw-600 mr-10">
                   Tôn giáo:
                 </Grid>
@@ -204,7 +202,7 @@ export default function EmployeeView(props) {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item container xs={12} className="pd-60" spacing={1}>
+            <Grid item container xs={12} className="pd-60 ml-10" spacing={1}>
               <Grid item container xs={6}>
                 <Grid item className="fw-600 mr-10">
                   Số bảo hiểm y tế:
@@ -219,8 +217,10 @@ export default function EmployeeView(props) {
                 </Grid>
                 <Grid item xs={6}>
                   {item?.issuedDateMedicalInsurance
-                    ? moment(item?.issuedDateMedicalInsurance).format('DD/MM/YYYY')
-                    : ''}
+                    ? moment(item?.issuedDateMedicalInsurance).format(
+                        "DD/MM/YYYY"
+                      )
+                    : ""}
                 </Grid>
               </Grid>
               <Grid item container xs={12}>
@@ -232,7 +232,7 @@ export default function EmployeeView(props) {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item container xs={12} className="pd-60" spacing={1}>
+            <Grid item container xs={12} className="pd-60 ml-10" spacing={1}>
               <Grid item container xs={6}>
                 <Grid item className="fw-600 mr-10">
                   Số bảo hiểm xã hội:
@@ -247,8 +247,10 @@ export default function EmployeeView(props) {
                 </Grid>
                 <Grid item xs={6}>
                   {item?.issuedDateSocialInsurance
-                    ? moment(item?.issuedDateSocialInsurance).format('DD/MM/YYYY')
-                    : ''}
+                    ? moment(item?.issuedDateSocialInsurance).format(
+                        "DD/MM/YYYY"
+                      )
+                    : ""}
                 </Grid>
               </Grid>
               <Grid item container xs={12}>
@@ -260,8 +262,11 @@ export default function EmployeeView(props) {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item container xs={12} className="pd-60" spacing={1}>
-              <Grid item container xs={12}>
+            <Grid item container xs={12} spacing={1}>
+              <Grid item container xs={12} className="pd-60 fw-600">
+                III. VỊ TRÍ LÀM VIỆC
+              </Grid>
+              <Grid item container xs={12} className="pd-60 ml-10">
                 <Grid item className="fw-600 mr-10">
                   Phòng ban:
                 </Grid>
@@ -269,7 +274,7 @@ export default function EmployeeView(props) {
                   {item?.department?.name}
                 </Grid>
               </Grid>
-              <Grid item container xs={12}>
+              <Grid item container xs={12} className="pd-60 ml-10">
                 <Grid item className="fw-600 mr-10">
                   Vị trí công việc:
                 </Grid>
@@ -277,7 +282,26 @@ export default function EmployeeView(props) {
                   {item?.positions[0]?.name}
                 </Grid>
               </Grid>
-              <Grid item container xs={12}>
+              <Grid item container xs={12} className="pd-60 fw-600">
+                IV. TRÌNH ĐỘ CHUYÊN MÔN
+              </Grid>
+              <Grid item container xs={12} className="pd-60 ml-10">
+                <Grid item className="fw-600 mr-10">
+                  Trình độ học vấn:
+                </Grid>
+                <Grid item xs={6}>
+                  {item?.education}
+                </Grid>
+              </Grid>
+              <Grid item container xs={12} className="pd-60 ml-10">
+                <Grid item className="fw-600 mr-10">
+                  Chuyên ngành:
+                </Grid>
+                <Grid item xs={7}>
+                  {item?.major}
+                </Grid>
+              </Grid>
+              <Grid item container xs={12} className="pd-60 ml-10">
                 <Grid item className="fw-600 mr-10">
                   Bằng cấp:
                 </Grid>
@@ -285,23 +309,29 @@ export default function EmployeeView(props) {
                   {item?.certificate?.name}
                 </Grid>
               </Grid>
-              <Grid item container xs={12}>
+              <Grid item container xs={12} className="pd-60 ml-10">
                 <Grid item className="fw-600 mr-10">
                   Danh sách chứng chỉ:
                 </Grid>
-                <Grid item xs={12}>
-                  <table style={{ width: '85%' }} className="table">
+                <Grid item xs={12} style={{ marginTop: 10 }}>
+                  <table style={{ width: "85%" }} className="table">
                     <tr className="tr">
-                      <th style={{ textAlign: 'left', width: '5%' }}>STT</th>
-                      <th style={{ textAlign: 'left', width: '20%' }}>Tên chứng chỉ</th>
-                      <th style={{ textAlign: 'left', width: '20%' }}>Mô tả</th>
+                      <th style={{ textAlign: "center", width: "5%" }}>STT</th>
+                      <th style={{ textAlign: "center", width: "20%" }}>
+                        Tên chứng chỉ
+                      </th>
+                      <th style={{ textAlign: "center", width: "20%" }}>
+                        Mô tả
+                      </th>
                     </tr>
                     {item?.languages.map((item, index) => (
                       <>
                         <tr className="tr">
-                          <td>{index + 1}</td>
-                          <td>{item?.name}</td>
-                          <td>{item?.description}</td>
+                          <td style={{ textAlign: "center" }}>{index + 1}</td>
+                          <td style={{ textAlign: "center" }}>{item?.name}</td>
+                          <td style={{ textAlign: "center" }}>
+                            {item?.description}
+                          </td>
                         </tr>
                       </>
                     ))}
@@ -316,13 +346,18 @@ export default function EmployeeView(props) {
             Hủy
           </Button>
           {item?.status === 12 || item?.status === 2 || item?.status === 3 ? (
-            ''
+            ""
           ) : (
             <Button
               variant="contained"
               color="primary"
               onClick={() => setShouldOpenConfirmDialog(true)}
-              disabled={item?.status === 12 || item?.status === 2 || item?.status === 3}
+              disabled={
+                item?.status === 12 ||
+                item?.status === 2 ||
+                item?.status === 3 ||
+                item?.status === 14
+              }
             >
               Trình lãnh đạo
             </Button>

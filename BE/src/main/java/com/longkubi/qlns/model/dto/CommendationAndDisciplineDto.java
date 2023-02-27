@@ -1,47 +1,65 @@
 package com.longkubi.qlns.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.longkubi.qlns.model.entity.Employee;
+import com.longkubi.qlns.model.entity.CommendationAndDiscipline;
+import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.modelmapper.ModelMapper;
 
 import java.util.Date;
+import java.util.Objects;
 import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+//@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class CommendationAndDisciplineDto {
-
     private UUID id;
-
-    private Integer status;
 
     //    @Column(name = "number_money")
 //    private Long numberMoney;//Số Tiền Thưởng Or Phạt
-    private int type;// 1 là kỉ luật / 2 khen thưởng
+    private Byte type;// 1 là kỉ luật / 2 khen thưởng / 3 tăng lương
 
     private String reason;//lí do khen thưởng kỉ luật
 
     private Date issuedDate;//ngày áp dụng
 
-    private Integer day;// ngày
+    private Byte day;// ngày
 
-    private Integer month;// tháng
+    private Byte month;// tháng
 
     private String staffName;// tên nhân viên
 
-    private Integer year;// năm
+    private Short year;// năm
 
     private String decisionNumber;// số quyết định
 
     private Date decisionDay;// ngày quyết định
 
-    private Double rewardDisciplineLevel;// mức khen thưởng kỉ luật
+    private Float rewardDisciplineLevel;// mức khen thưởng kỉ luật (tiền)
+
+    private Integer basicSalary;// mức lương cơ bản
+
+    private Float coefficientSalary; //Hệ Số Lương
+
+    private Integer hourlyRate;//Số tiền tính cho 1h làm thêm
+
+    private Byte status;
+
+    private EmployeeDto employeeDto;
+    private static ModelMapper modelMapper = new ModelMapper();
+
+    public static CommendationAndDisciplineDto convertFromEntityToDto(CommendationAndDiscipline entity) {
+        CommendationAndDisciplineDto dto = modelMapper.map(entity, CommendationAndDisciplineDto.class);
+        if (!Objects.isNull(entity.getEmployee())) {
+            dto.setEmployeeDto(modelMapper.map(entity.getEmployee(), EmployeeDto.class));
+        }
+
+        return dto;
+    }
 
 }

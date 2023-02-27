@@ -19,15 +19,15 @@ public interface TimeKeepingRepository extends JpaRepository<TimeKeeping, UUID> 
 
     TimeKeeping getTimeKeepingById(UUID id);
 
-    @Query("select e from TimeKeeping e ORDER BY e.dateCreated ASC  ")
+    @Query("select e from TimeKeeping e ORDER BY e.dateCreated DESC  ")
     List<TimeKeeping> getAll();
 
     @Query("SELECT CASE WHEN COUNT(t) > 0 THEN true ELSE false END from TimeKeeping t where  t.employee.id = :employeeId and t.month = :month and t.year = :year")
-    boolean existsTimeKeepingByMonthAndYear(@Param("month") int month, @Param("year") int year, @Param("employeeId") UUID employeeId);
+    boolean existsTimeKeepingByMonthAndYear(@Param("month") byte month, @Param("year") short year, @Param("employeeId") UUID employeeId);
 
     // public boolean isValidMonthYear(int month, int year);
     @Query("SELECT CASE WHEN COUNT(t) > 0 THEN true ELSE false END from TimeKeeping t where  t.id <> :id and t.month = :month and t.year = :year and t.employee.id = :employeeId")
-    boolean isValidMonthYearExcludingCurrent(@Param("month") int month, @Param("year") int year, @Param("employeeId") UUID employeeId, @Param("id") UUID id);
+    boolean isValidMonthYearExcludingCurrent(@Param("month") byte month, @Param("year") short year, @Param("employeeId") UUID employeeId, @Param("id") UUID id);
 
 
 }

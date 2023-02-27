@@ -18,8 +18,6 @@ import { getListDepartment, getListPosition, editEmployee } from './UpdateHappen
 import { toast } from 'react-toastify';
 import Button from '@mui/material/Button';
 
-const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
-const checkedIcon = <CheckBoxIcon fontSize="small" />;
 const filterOptions = createFilterOptions({
   // matchFrom: 'start',
   stringify: (option) => option.name,

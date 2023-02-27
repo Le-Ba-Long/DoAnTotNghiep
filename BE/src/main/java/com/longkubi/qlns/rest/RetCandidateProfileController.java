@@ -4,7 +4,10 @@ import com.longkubi.qlns.model.dto.CandidateProfileDto;
 import com.longkubi.qlns.model.dto.ResponseData;
 import com.longkubi.qlns.model.dto.search.CandidateProfileSearchDto;
 import com.longkubi.qlns.service.ICandidateProfileService;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -22,14 +25,21 @@ import static com.longkubi.qlns.common.Global.getTokenFromHeaders;
 @RestController
 @RequestMapping("api/candidate-profiles")
 //@PreAuthorize("hasAnyAuthority('ADMIN','ACCOUNTANCY')")
+@Slf4j
 public class RetCandidateProfileController {
     @Autowired
     private ICandidateProfileService sv;
 
-
+    @Cacheable(value = "candidateProfiles")
     @GetMapping()
     public ResponseData<List<CandidateProfileDto>> getAll() {
-        return sv.getAll();
+        long startTime = System.currentTimeMillis();
+        log.info(String.valueOf(startTime));
+        ResponseData<List<CandidateProfileDto> >list = sv.getAll();
+        long endTime = System.currentTimeMillis();
+        long elapsedTime = endTime - startTime;
+        log.info( "Tổng Thời gian call : "+String.valueOf(elapsedTime));
+        return list;
     }
 
     @PostMapping("searchByDto")

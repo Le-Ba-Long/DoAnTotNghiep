@@ -1,5 +1,6 @@
 package com.longkubi.qlns.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,6 +9,7 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -30,24 +32,35 @@ public class User implements Serializable {
     private UUID id;
     @Column(name = "user_name")
     private String userName;
+
+  // @JsonIgnore
     @Column(name = "pass_word")
     private String passWord;
     @Column(name = "full_name", columnDefinition = "nvarchar(255)")
     private String fullName;
     @Column(name = "email")
     private String email;
+
+    private String phone;
+    private String sex;
+
+    private Date dateOfBirth;
+
+    private String address;
     @Lob
     private String avatar;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "tbl_user_role", joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id")})
     private Set<Role> roles = new HashSet<>();
-    public User( String fullName, String userName, String email, String encode) {
+
+    public User(String fullName, String userName, String email, String encode) {
         this.fullName = fullName;
         this.userName = userName;
         this.email = email;
         this.passWord = encode;
     }
+
     public User(UUID id, String fullName, String username, String email, String password, String avatar, Set<Role> roles) {
         this.id = id;
         this.fullName = fullName;
@@ -57,6 +70,7 @@ public class User implements Serializable {
         this.avatar = avatar;
         this.roles = roles;
     }
+
     public User(String fullName, String username, String email, String password, Set<Role> roles) {
         this.fullName = fullName;
         this.userName = username;

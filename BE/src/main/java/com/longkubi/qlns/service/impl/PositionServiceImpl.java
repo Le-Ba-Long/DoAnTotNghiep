@@ -35,10 +35,8 @@ public class PositionServiceImpl implements IPositionService {
     private ModelMapper modelMapper;
     @Autowired
     private JwtProvider jwtProvider;
-
     @Autowired
     private EntityManager manager;
-
     @Override
     public ResponseData<PositionDto> create(PositionDto positionDto, String token) {
         ErrorMessage errorMessage = validateLanguage(positionDto, null, Constant.Insert);
@@ -49,8 +47,6 @@ public class PositionServiceImpl implements IPositionService {
         entity.setDateCreated(new Date());
         return new ResponseData<>(modelMapper.map(repo.save(entity), PositionDto.class));
     }
-
-
     @Override
     public ResponseData<PositionDto> update(PositionDto positionDto, UUID id, String token) {
         ErrorMessage errorMessage = validateLanguage(positionDto, id, Constant.Update);
@@ -63,10 +59,9 @@ public class PositionServiceImpl implements IPositionService {
         entity.setDateChange(new Date());
         return new ResponseData<>(modelMapper.map(repo.save(entity), PositionDto.class));
     }
-
     @Override
     public ResponseData<List<PositionDto>> getAll() {
-       // List<Position> positions = repo.findAll();
+        // List<Position> positions = repo.findAll();
         List<Position> positions = repo.getAll();
         if (positions.isEmpty()) return new ResponseData<>(SUCCESS, null);
         return new ResponseData<>(positions.stream().map(dto -> modelMapper.map(dto, PositionDto.class)).collect(Collectors.toList()));
@@ -111,7 +106,6 @@ public class PositionServiceImpl implements IPositionService {
         if (result.isEmpty()) return new ResponseData<>(LIST_IS_EMPTY, null);
         return new ResponseData<>(result);
     }
-
 
     private String genOrderByClause(PositionSearchDto dto) {
         if (dto.getOrderByFilter() != null && StringUtils.hasText(dto.getOrderByFilter())) {
@@ -211,7 +205,6 @@ public class PositionServiceImpl implements IPositionService {
             return new ResponseData<>(ID_NOT_EXIST, false);
         }
     }
-
     @Override
     public PositionDto getPositionById(UUID id) {
         if (repo.existsPositionById(id)) {
@@ -220,14 +213,12 @@ public class PositionServiceImpl implements IPositionService {
             return null;
         }
     }
-
     @Override
     public Set<PositionDto> getPositionByListId(Set<UUID> ids) {
         return repo.getPositionByListId(ids).stream()
                 .map(position -> modelMapper.map(position, PositionDto.class))
                 .collect(Collectors.toSet());
     }
-
     private ErrorMessage validateLanguage(PositionDto positionDto, UUID id, String action) {
         if (Constant.Insert.equals(action)) {
             if (Objects.isNull(positionDto)) return OBJECT_CANNOT_EMPTY;

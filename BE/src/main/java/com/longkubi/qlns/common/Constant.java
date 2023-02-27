@@ -33,46 +33,46 @@ public class Constant {
     public static final String Update = "Update";
 
     public enum StatusType {
-        NOT_APPROVED(-1),//Không duyệt
-        NEW_SAVE(1),//Lưu mới
-        PENDING(2),//Chờ Duyệt (chưa được chấp thuận)
-        APPROVED(3),//Đã phê duyệt
-        PROCESSING(4),//Đang thực hiện
+        NOT_APPROVED((byte) -1),//Không duyệt
+        NEW_SAVE((byte) 1),//Lưu mới
+        PENDING((byte) 2),//Chờ Duyệt (chưa được chấp thuận)
+        APPROVED((byte) 3),//Đã phê duyệt
+        PROCESSING((byte) 4),//Đang thực hiện
 
-        FINISHED(5),//Đã kết thúc
-        REJECT(6),//Từ Chối
+        FINISHED((byte) 5),//Đã kết thúc
+        REJECT((byte) 6),//Từ Chối
 
-        RECEIVE(7),//Tiếp Nhận
+        RECEIVE((byte) 7),//Tiếp Nhận
 
-        PASS(8),// Pass Phỏng Vấn
+        PASS((byte) 8),// Pass Phỏng Vấn
 
-        NOT_PASS(9),//Không Pass Phỏng Vấn
-        FIX_REQUEST(10),// Yêu cầu chỉnh sửa
-        WAITING_RE_APPROVED(11),// Chờ đợi approved (sau khi yêu cầu chỉnh sửa hoàn tất)
+        NOT_PASS((byte) 9),//Không Pass Phỏng Vấn
+        FIX_REQUEST((byte) 10),// Yêu cầu chỉnh sửa
+        WAITING_RE_APPROVED((byte) 11),// Chờ đợi approved (sau khi yêu cầu chỉnh sửa hoàn tất)
 
-        TRY_JOB(12),//Thử  Việc
+        TRY_JOB((byte) 12),//Thử  Việc
 
-        END_TRY_JOB(13),// Kết Thúc Thử  Việc
+        END_TRY_JOB((byte) 13),// Kết Thúc Thử  Việc
 
-        OFFICIAL_STAFF(14),// Nhân Viên Chính Thức
+        OFFICIAL_STAFF((byte) 14),// Nhân Viên Chính Thức
 
-        RETIRED_FROM_WORK(15),// Nhân Viên Đã Nghỉ Việc
+        RETIRED_FROM_WORK((byte) 15),// Nhân Viên Đã Nghỉ Việc
 
-        FIRED(16),// Nhân Viên Đã Sa Thải
+        FIRED((byte) 16),// Nhân Viên Đã Sa Thải
 
-        PENDING_TREATMENT(17),// Chờ Xử Lí
+        PENDING_TREATMENT((byte) 17),// Chờ Xử Lí
 
-        WAITING_FOR_INTERVIEW(18),// Chờ Phỏng Vấn
+        WAITING_FOR_INTERVIEW((byte) 18),// Chờ Phỏng Vấn
 
-        MERGED(18), // Đã được merge
+        CANDIDATE_PROFILE_CONVERSION((byte) 19)//Chuyển đổi hồ sơ ứng viên
         ;
-        private final int type;
+        private final byte type;
 
-        StatusType(final int type) {
+        StatusType(final byte type) {
             this.type = type;
         }
 
-        public static StatusType parse(Integer type) {
+        public static StatusType parse(Byte type) {
             if (type == null) {
                 return null;
             }
@@ -86,7 +86,7 @@ public class Constant {
             return null;
         }
 
-        public static List<Integer> getByDisplayStatus(int displayStatus) {
+        public static List<Byte> getByDisplayStatus(byte displayStatus) {
             if (displayStatus == 1) {
                 // <=2 + +4 + 7 + 9 + 10
                 return Stream.of(NOT_APPROVED, NEW_SAVE, PENDING, PROCESSING, FIX_REQUEST, WAITING_RE_APPROVED)
@@ -107,13 +107,13 @@ public class Constant {
             }
         }
 
-        public static List<Integer> getAllStatus() {
+        public static List<Byte> getAllStatus() {
             return Arrays.stream(values())
                     .map(StatusType::getType)
                     .collect(Collectors.toList());
         }
 
-        public int getType() {
+        public byte getType() {
             return type;
         }
     }

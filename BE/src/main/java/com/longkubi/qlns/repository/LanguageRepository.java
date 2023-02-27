@@ -21,7 +21,7 @@ public interface LanguageRepository extends JpaRepository<Language, UUID> {
     @Query("select count (e) from Language e where e.name = :name and e.id<>:id")
     Integer exclusionName(@Param("name") String name,UUID id);
     Language getLanguageById(UUID id);
-    @Query("select e from Language e ORDER BY e.dateCreated ASC  ")
+    @Query("select e from Language e ORDER BY e.dateCreated DESC  ")
     List<Language> getAll();
 
 }

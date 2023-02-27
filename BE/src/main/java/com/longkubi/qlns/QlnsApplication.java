@@ -1,6 +1,7 @@
 package com.longkubi.qlns;
 
 import com.longkubi.qlns.config.FileStorageProperties;
+import com.longkubi.qlns.model.entity.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,6 +21,8 @@ public class QlnsApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(QlnsApplication.class, args);
+
+        User user = new User();
     }
 
 }

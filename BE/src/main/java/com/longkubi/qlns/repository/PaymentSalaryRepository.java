@@ -18,7 +18,7 @@ public interface PaymentSalaryRepository extends JpaRepository<PaymentSalary, UU
 
     PaymentSalary getPaymentSalaryById(UUID id);
 
-    @Query("select e from PaymentSalary e ORDER BY e.dateCreated ASC  ")
+    @Query("select e from PaymentSalary e ORDER BY e.dateCreated DESC  ")
     List<PaymentSalary> getAll();
 
     @Query("select p from PaymentSalary p join TimeKeeping t " +

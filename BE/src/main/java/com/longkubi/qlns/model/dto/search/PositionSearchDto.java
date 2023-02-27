@@ -16,12 +16,9 @@ import java.util.Set;
 @Getter
 @Setter
 public class PositionSearchDto extends SearchDto {
-
     @Pattern(regexp = Constant.REGEX_CODE_POSITION, message = "Code Chưa Đúng Format " + Constant.REGEX_CODE_POSITION)
     private String code;
-
     @Size(min = 5, max = 50, message = "Tên Không Được Nhỏ Hơn 5 Kí Tự Và Lớn Hơn 100 Kí Tự")
     private String name;
-
     private Set<Employee> employees;
 }

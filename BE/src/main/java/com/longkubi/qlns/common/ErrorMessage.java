@@ -19,6 +19,10 @@ public enum ErrorMessage {
 
     DATA_WRONG_FORM(13," Dữ Liệu Không Đúng Định Dạng"),
     MONTH_AND_YEAR_EXIST(13,"Tháng Và Năm Bạn Nhập Đã Tồn Tại"),
+
+    ACCOUNT_NAME_NOT_EXISTS(14, "Tên Tài Khoản Không Tồn Tại"),
+
+    OLD_PASSWORD_INCORRECT(15,"Mật Khẩu Cũ Không Chính Xác"),
     SUCCESS(200, "Success"),
     ERROR(400, "Error");
     private final int code;

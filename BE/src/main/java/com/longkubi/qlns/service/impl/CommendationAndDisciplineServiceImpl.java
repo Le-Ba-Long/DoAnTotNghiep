@@ -6,7 +6,9 @@ import com.longkubi.qlns.model.dto.CommendationAndDisciplineDto;
 import com.longkubi.qlns.model.dto.ResponseData;
 import com.longkubi.qlns.model.dto.search.CommendationAndDisciplineSearchDto;
 import com.longkubi.qlns.model.entity.CommendationAndDiscipline;
+import com.longkubi.qlns.model.entity.Employee;
 import com.longkubi.qlns.repository.CommendationAndDisciplineRepository;
+import com.longkubi.qlns.repository.EmployeeRepository;
 import com.longkubi.qlns.security.jwt.JwtProvider;
 import com.longkubi.qlns.service.ICommendationAndDisciplineService;
 import org.modelmapper.ModelMapper;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
@@ -24,6 +27,7 @@ import java.util.stream.Collectors;
 import static com.longkubi.qlns.common.ErrorMessage.*;
 
 @Service
+@Transactional
 public class CommendationAndDisciplineServiceImpl implements ICommendationAndDisciplineService {
     @Autowired
     private CommendationAndDisciplineRepository repo;
@@ -33,19 +37,37 @@ public class CommendationAndDisciplineServiceImpl implements ICommendationAndDis
     private JwtProvider jwtProvider;
 
     @Autowired
+    private EmployeeRepository employeeRepository;
+    @Autowired
     private EntityManager manager;
 
+    //    @Override
+//    public ResponseData<CommendationAndDisciplineDto> create(CommendationAndDisciplineDto commendationAndDisciplineDto, String token) {
+//        ErrorMessage errorMessage = validateContract(commendationAndDisciplineDto, null, Constant.Insert);
+//        if (!errorMessage.equals(SUCCESS)) return new ResponseData<>(errorMessage, null);
+//        CommendationAndDiscipline entity = new CommendationAndDiscipline();
+//        modelMapper.map(commendationAndDisciplineDto, entity);
+//     //   entity.setEmployee(modelMapper.map(commendationAndDisciplineDto.getEmployeeDto(),Employee.class));
+//        Employee employee = employeeRepository.getEmployeeById(commendationAndDisciplineDto.getEmployeeDto().getId());
+//        entity.setEmployee(employee);
+//        entity.setCreator(jwtProvider.getUserNameFromToken(token));
+//        entity.setDateCreated(new Date());
+//        return new ResponseData<>(modelMapper.map(repo.save(entity), CommendationAndDisciplineDto.class));
+//
+//    }
     @Override
+    // @Transactional
     public ResponseData<CommendationAndDisciplineDto> create(CommendationAndDisciplineDto commendationAndDisciplineDto, String token) {
         ErrorMessage errorMessage = validateContract(commendationAndDisciplineDto, null, Constant.Insert);
         if (!errorMessage.equals(SUCCESS)) return new ResponseData<>(errorMessage, null);
         CommendationAndDiscipline entity = new CommendationAndDiscipline();
         modelMapper.map(commendationAndDisciplineDto, entity);
-        //entity.setEmployee(modelMapper.map(commendationAndDisciplineDto.getEmployee(), Employee.class));
+        //entity.setEmployee(modelMapper.map(commendationAndDisciplineDto.getEmployeeDto(),Employee.class ));
+//        Employee employee = employeeRepository.getEmployeeById(commendationAndDisciplineDto.getEmployeeDto().getId());
+//        entity.setEmployee(employee);
         entity.setCreator(jwtProvider.getUserNameFromToken(token));
         entity.setDateCreated(new Date());
         return new ResponseData<>(modelMapper.map(repo.save(entity), CommendationAndDisciplineDto.class));
-
     }
 
     @Override
@@ -58,15 +80,29 @@ public class CommendationAndDisciplineServiceImpl implements ICommendationAndDis
         entity.setMonth(commendationAndDisciplineDto.getMonth());
         entity.setYear(commendationAndDisciplineDto.getYear());
         entity.setReason(commendationAndDisciplineDto.getReason());
-        entity.setIssuedDate(commendationAndDisciplineDto.getIssuedDate());
+        if(!Objects.isNull(commendationAndDisciplineDto.getIssuedDate())){
+        entity.setIssuedDate(commendationAndDisciplineDto.getIssuedDate());}
         // entity.setDecisionDay(commendationAndDisciplineDto.getDecisionDay());
         entity.setType(commendationAndDisciplineDto.getType());
         entity.setDecisionNumber(commendationAndDisciplineDto.getDecisionNumber());
-        entity.setRewardDisciplineLevel(commendationAndDisciplineDto.getRewardDisciplineLevel());
+        if (!Objects.isNull(commendationAndDisciplineDto.getRewardDisciplineLevel())) {
+            entity.setRewardDisciplineLevel(commendationAndDisciplineDto.getRewardDisciplineLevel());
+        }
+        if(!Objects.isNull(commendationAndDisciplineDto.getBasicSalary())){
+            entity.setBasicSalary(commendationAndDisciplineDto.getBasicSalary());
+        }
+        if(!Objects.isNull(commendationAndDisciplineDto.getCoefficientSalary())){
+            entity.setCoefficientSalary(commendationAndDisciplineDto.getCoefficientSalary());
+        }
+        if (!Objects.isNull(commendationAndDisciplineDto.getHourlyRate())) {
+            entity.setHourlyRate(commendationAndDisciplineDto.getHourlyRate());
+        }
         entity.setStaffName(commendationAndDisciplineDto.getStaffName());
         entity.setStatus(commendationAndDisciplineDto.getStatus());
         entity.setChangedBy(jwtProvider.getUserNameFromToken(token));
         entity.setDateChange(new Date());
+        Employee employee = employeeRepository.getEmployeeById(commendationAndDisciplineDto.getEmployeeDto().getId());
+        entity.setEmployee(employee);
         return new ResponseData<>(modelMapper.map(repo.save(entity), CommendationAndDisciplineDto.class));
     }
 
@@ -75,7 +111,8 @@ public class CommendationAndDisciplineServiceImpl implements ICommendationAndDis
         // List<Contract> contractList = repo.findAll();
         List<CommendationAndDiscipline> commendationAndDisciplineList = repo.getAll();
         if (commendationAndDisciplineList.isEmpty()) return new ResponseData<>(SUCCESS, new ArrayList<>());
-        return new ResponseData<>(commendationAndDisciplineList.stream().map(dto -> modelMapper.map(dto, CommendationAndDisciplineDto.class)).collect(Collectors.toList()));
+        //   return new ResponseData<>(commendationAndDisciplineList.stream().map(dto -> modelMapper.map(dto, CommendationAndDisciplineDto.class)).collect(Collectors.toList()));
+        return new ResponseData<>(commendationAndDisciplineList.stream().map(CommendationAndDisciplineDto::convertFromEntityToDto).collect(Collectors.toList()));
     }
 
     /**

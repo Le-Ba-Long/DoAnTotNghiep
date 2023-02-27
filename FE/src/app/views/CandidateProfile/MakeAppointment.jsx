@@ -33,6 +33,7 @@ export default function MakeAppointment(props) {
           /^[0-9a-zA-Z].{5,100}$/,
           'Họ tên người hẹn phải lớn hơn 5 kí tự và nhỏ hơn 100 kí tự'
         )
+        .nullable()
         .required('Vui lòng nhập trường này'),
       interviewDate: Yup.date()
         .nullable()

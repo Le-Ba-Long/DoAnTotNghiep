@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
@@ -18,6 +19,8 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "tbl_commendation_and_discipline")//Khen Thưởng Kỉ Luật
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class CommendationAndDiscipline implements Serializable {
     @Transient
     private static final long serialVersionUID = 4559994432567537044L;
@@ -29,10 +32,10 @@ public class CommendationAndDiscipline implements Serializable {
     private UUID id;
 
     @Column(name = "status")
-    private int status;
+    private byte status;
 
     @Column(name = "type")
-    private int type;// 1 là kỉ luật / 2 khen thưởng
+    private byte type;// 1 là kỉ luật / 2 khen thưởng / 3 tăng lương
 
     //    @Column(name = "number_money")
 //    private Long numberMoney;//Số Tiền Thưởng Or Phạt
@@ -46,12 +49,13 @@ public class CommendationAndDiscipline implements Serializable {
     private Date issuedDate;//ngày áp dụng
 
     @Column(name = "_day")
-    private int day;
+    private byte day;
+
     @Column(name = "_month")
-    private int month;
+    private byte month;
 
     @Column(name = "_year")
-    private int year;
+    private short year;
 
     @Column(name = "decision_number")
     private String decisionNumber;// số quyết định
@@ -60,7 +64,16 @@ public class CommendationAndDiscipline implements Serializable {
     private Date decisionDay;// ngày quyết định
 
     @Column(name = "reward_discipline_level")
-    private double rewardDisciplineLevel;// mức khen thưởng kỉ luật
+    private float rewardDisciplineLevel;// mức khen thưởng kỉ luật
+
+    @Column(name = "basic_salary")
+    private int basicSalary;// mức lương cơ bản
+
+    @Column(name = "coefficient_salary")
+    private float coefficientSalary; //Hệ Số Lương
+
+    @Column(name = "hourly_rate")
+    private int hourlyRate;//Số tiền tính cho 1h làm thêm
 
     @Column(name = "creator")
     private String creator;
@@ -74,9 +87,10 @@ public class CommendationAndDiscipline implements Serializable {
     @Column(name = "date_change")
     private Date dateChange;
 
-//    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
-//    @JoinColumn(name = "employee_code")
-//    private Employee employee;
+    //@ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "employee_code", nullable = false)
+    private Employee employee;
 
 //    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 //    @JoinColumn(name = "timeKeeping_id", referencedColumnName = "id")

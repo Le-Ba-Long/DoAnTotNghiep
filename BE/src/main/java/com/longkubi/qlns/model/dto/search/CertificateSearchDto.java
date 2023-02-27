@@ -12,14 +12,9 @@ import java.util.Date;
 @Getter
 @Setter
 public class CertificateSearchDto extends SearchDto {
-
     private String code;
-
     private String name;
-
     private String majors;
-
     private Date issuedDate;
-
     private String grantedBy;
 }

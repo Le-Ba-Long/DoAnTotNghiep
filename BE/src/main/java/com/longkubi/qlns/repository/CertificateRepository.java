@@ -24,7 +24,7 @@ public interface CertificateRepository extends JpaRepository<Certificate, UUID> 
     @Query("select count (e) from Certificate e where e.name = :name and e.id<>:id")
     Integer exclusionName(@Param("name") String name, UUID id);
 
-    @Query("select e from Certificate e ORDER BY e.dateCreated ASC  ")
+    @Query("select e from Certificate e ORDER BY e.dateCreated desc  ")
     List<Certificate> getAll();
 
     Certificate getCertificateById(UUID id);

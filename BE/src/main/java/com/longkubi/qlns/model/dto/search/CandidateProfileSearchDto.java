@@ -17,39 +17,25 @@ import java.util.Date;
 @NoArgsConstructor
 @Getter
 @Setter
-public class CandidateProfileSearchDto extends SearchDto{
-
+public class CandidateProfileSearchDto extends SearchDto {
     @NotBlank(message = "Trường Code Không Được Để Trống")
     @Pattern(regexp = Constant.REGEX_CODE_CERTIFICATE, message = "Code Chưa Đúng Format " + Constant.REGEX_CODE_CERTIFICATE)
     private String code;
-
     private String fullName;
-
     private Date dateOfBirth;
-
     @NegativeOrZero
-    private Integer age;
-
+    private Byte age;
     private String address;
-
     @Email(message = "Email Không Hợp Lệ", regexp = Constant.REGEX_EMAIL)
     private String email;
-
     @Pattern(message = "Số Điện Thoại Không Hợp Lệ ", regexp = Constant.REGEX_PHONE)
     private String phone;
-
     private String education;
-
     private String major;
-
     private Recruit recruit;
-
     private String creator;
-
     private Date dateCreated;
-
     private String changedBy;
-
     private Date dateChange;
 
 }

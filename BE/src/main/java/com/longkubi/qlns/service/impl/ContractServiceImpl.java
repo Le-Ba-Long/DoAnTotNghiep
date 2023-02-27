@@ -6,8 +6,9 @@ import com.longkubi.qlns.model.dto.ContractDto;
 import com.longkubi.qlns.model.dto.ResponseData;
 import com.longkubi.qlns.model.dto.search.ContractSearchDto;
 import com.longkubi.qlns.model.entity.Contract;
-import com.longkubi.qlns.model.entity.Employee;
+import com.longkubi.qlns.model.entity.EmployeeHistory;
 import com.longkubi.qlns.repository.ContractRepository;
+import com.longkubi.qlns.repository.EmployeeHistoryRepository;
 import com.longkubi.qlns.security.jwt.JwtProvider;
 import com.longkubi.qlns.service.IContractService;
 import org.modelmapper.ModelMapper;
@@ -31,6 +32,8 @@ public class ContractServiceImpl implements IContractService {
     @Autowired
     private ContractRepository repo;
     @Autowired
+    private EmployeeHistoryRepository employeeHistoryRepository;
+    @Autowired
     private ModelMapper modelMapper;
     @Autowired
     private JwtProvider jwtProvider;
@@ -50,7 +53,6 @@ public class ContractServiceImpl implements IContractService {
         return new ResponseData<>(modelMapper.map(repo.save(entity), ContractDto.class));
 
     }
-
 
     @Override
     public ResponseData<ContractDto> update(ContractDto contractDto, UUID id, String token) {
@@ -74,7 +76,7 @@ public class ContractServiceImpl implements IContractService {
 
     @Override
     public ResponseData<List<ContractDto>> getAll() {
-       // List<Contract> contractList = repo.findAll();
+        // List<Contract> contractList = repo.findAll();
         List<Contract> contractList = repo.getAll();
         if (contractList.isEmpty()) return new ResponseData<>(SUCCESS, new ArrayList<>());
         return new ResponseData<>(contractList.stream().map(dto -> modelMapper.map(dto, ContractDto.class)).collect(Collectors.toList()));
@@ -116,7 +118,6 @@ public class ContractServiceImpl implements IContractService {
         if (result.isEmpty()) return new ResponseData<>(LIST_IS_EMPTY, null);
         return new ResponseData<>(result);
     }
-
 
     private String genOrderByClause(ContractSearchDto dto) {
         if (dto.getOrderByFilter() != null && StringUtils.hasText(dto.getOrderByFilter())) {
@@ -243,7 +244,7 @@ public class ContractServiceImpl implements IContractService {
     public ResponseData<Boolean> deleteById(UUID id) {
         if (Boolean.TRUE.equals(repo.existsContractById(id))) {
             repo.deleteById(id);
-            return new ResponseData<>(SUCCESS,true);
+            return new ResponseData<>(SUCCESS, true);
         } else {
             return new ResponseData<>(ID_NOT_EXIST, false);
         }
@@ -251,7 +252,15 @@ public class ContractServiceImpl implements IContractService {
 
     @Override
     public ContractDto getContractById(UUID id) {
-        return modelMapper.map(repo.getContractById(id),ContractDto.class);
+        return modelMapper.map(repo.getContractById(id), ContractDto.class);
+    }
+
+    @Override
+    public ResponseData<ContractDto> getContractByEmployeeId(UUID employeeId) {
+        ContractDto contract = modelMapper.map(repo.getContractByEmployeeId(employeeId), ContractDto.class);
+        if (contract == null)
+            return new ResponseData<>(null);
+        return new ResponseData<>(contract);
     }
 
     private ErrorMessage validateContract(ContractDto contractDto, UUID id, String action) {

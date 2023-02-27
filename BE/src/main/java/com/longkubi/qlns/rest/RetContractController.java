@@ -51,4 +51,9 @@ public class RetContractController {
     public ResponseData<Boolean> deleteById(@PathVariable(name = "id") UUID id, @RequestHeader HttpHeaders headers) {
         return sv.deleteById(id);
     }
+
+    @GetMapping("/get-contract-by-employeeId/{employeeId}")
+    public ResponseData<ContractDto> getContractByEmployeeId(@PathVariable(name = "employeeId") UUID employeeId) {
+        return sv.getContractByEmployeeId(employeeId);
+    }
 }

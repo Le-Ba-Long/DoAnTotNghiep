@@ -22,7 +22,7 @@ import {
 } from './CommendationAndDisciplineService';
 
 export default function CommendationAndDisciplineDialog(props) {
-  const { open, handleClose, item, readOnly } = props;
+  const { open, handleClose, item, readOnly, employee, handleCloseDialog } = props;
   const [typeObj, setTypeObj] = useState('');
   const [method, setMethod] = useState('');
 
@@ -35,8 +35,9 @@ export default function CommendationAndDisciplineDialog(props) {
       type: item?.id ? item?.type : '',
       reason: item?.id ? item?.reason : '',
       rewardDisciplineLevel: item?.id ? item?.rewardDisciplineLevel : '',
-      staffName: item?.id ? item?.staffName : '',
+      staffName: item?.id ? item?.staffName : employee?.fullName || '',
       status: item?.id ? item?.status : '',
+      employeeDto: item?.id ? item?.employeeDto : employee || {},
     },
     enableReinitialize: true,
     validateOnChange: false,
@@ -56,6 +57,9 @@ export default function CommendationAndDisciplineDialog(props) {
       values.id = item?.id;
       values.rewardDisciplineLevel = Number(values.rewardDisciplineLevel);
       values.status = method;
+      if (readOnly) {
+        values.type = item?.type;
+      }
       handleAdd(values);
     },
   });
@@ -112,7 +116,7 @@ export default function CommendationAndDisciplineDialog(props) {
   return (
     <Dialog open={open} fullWidth maxWidth={'md'}>
       <DialogTitle style={{ marginBlockEnd: 0, padding: '16px 24px 0' }}>
-        <Box className="icon-close" onClick={handleClose}>
+        <Box className="icon-close" onClick={handleCloseDialog}>
           <IconButton color="error">
             <CloseIcon />
           </IconButton>
@@ -193,14 +197,13 @@ export default function CommendationAndDisciplineDialog(props) {
               item
               xs={12}
               md={12}
-              spacing={2}
               justifyContent="flex-end"
-              style={{ marginBottom: 20 }}
+              style={{ marginBottom: 20, marginRight: 10 }}
             >
-              <Grid item style={{ lineHeight: '2', marginRight: 5 }}>
+              <Grid item style={{ lineHeight: '1.5', marginRight: 5 }}>
                 Hà Nội, ngày{' '}
               </Grid>
-              <Grid item xs={1} md={1}>
+              <Grid item style={{ width: 30 }}>
                 <TextField
                   variant="standard"
                   type="number"
@@ -214,10 +217,10 @@ export default function CommendationAndDisciplineDialog(props) {
                   helperText={formik.errors.day}
                 />
               </Grid>
-              <Grid item style={{ lineHeight: '2', marginRight: 5 }}>
+              <Grid item style={{ lineHeight: '1.5', marginRight: 5 }}>
                 tháng
               </Grid>
-              <Grid item xs={1} md={1}>
+              <Grid item style={{ width: 30 }}>
                 <TextField
                   variant="standard"
                   type="number"
@@ -231,10 +234,10 @@ export default function CommendationAndDisciplineDialog(props) {
                   helperText={formik.errors.month}
                 />
               </Grid>
-              <Grid item style={{ lineHeight: '2', marginRight: 5 }}>
+              <Grid item style={{ lineHeight: '1.5', marginRight: 5 }}>
                 năm
               </Grid>
-              <Grid item xs={1} md={1}>
+              <Grid item style={{ width: 50 }}>
                 <TextField
                   variant="standard"
                   type="number"
@@ -325,11 +328,11 @@ export default function CommendationAndDisciplineDialog(props) {
                 <Grid item xs={12} md={12}>
                   - Căn cứ vào Điều lệ hoạt động của Công ty OCEANTECH;
                 </Grid>
-                {formik.values?.type === 1 ? (
+                {item?.type === 1 ? (
                   <Grid item xs={12} md={12}>
                     - Để động viên khuyến khích CBNV toàn Công ty
                   </Grid>
-                ) : formik.values?.type === 2 ? (
+                ) : item?.type === 2 ? (
                   <Grid item xs={12} md={12}>
                     - Xét tính chất và mức độ vi phạm
                   </Grid>
@@ -372,9 +375,9 @@ export default function CommendationAndDisciplineDialog(props) {
             >
               <Grid item xs={1} md={1}></Grid>
               <Grid container item xs={10} md={10}>
-                <Grid item style={{ lineHeight: '2', marginRight: 5 }}>
+                <Grid item style={{ lineHeight: '1.5', marginRight: 5 }}>
                   {' '}
-                  <span>1: </span> {typeObj?.name}: Ông/bà
+                  <span>1: </span> {typeObj?.name}: Ông/bà:
                 </Grid>
                 <Grid item xs={4}>
                   <TextField
@@ -419,7 +422,7 @@ export default function CommendationAndDisciplineDialog(props) {
               <Grid item xs={1} md={1}></Grid>
               <Grid item xs={1} md={1}></Grid>
               <Grid container item xs={10} md={10}>
-                <Grid item style={{ lineHeight: '2', marginRight: 5 }}>
+                <Grid item style={{ lineHeight: '1.5', marginRight: 5 }}>
                   {' '}
                   <span>3: </span> Mức {typeObj?.name} :
                 </Grid>
@@ -485,16 +488,16 @@ export default function CommendationAndDisciplineDialog(props) {
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" color="secondary" onClick={handleClose}>
+          <Button variant="contained" color="secondary" onClick={handleCloseDialog}>
             Hủy
           </Button>
           {readOnly ? (
-            <Button type="submit" variant="contained" color="primary" onClick={() => setMethod(1)}>
+            <Button type="submit" variant="contained" color="primary" onClick={() => setMethod(4)}>
               Phê duyệt
             </Button>
           ) : (
             <Button type="submit" variant="contained" color="primary" onClick={() => setMethod(1)}>
-              {item.id ? 'Lưu' : 'Thêm'}
+              {item?.id ? 'Lưu' : 'Thêm'}
             </Button>
           )}
         </DialogActions>

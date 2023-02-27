@@ -1,15 +1,12 @@
 package com.longkubi.qlns.service.impl;
 
-import com.longkubi.qlns.model.dto.*;
+import com.longkubi.qlns.model.dto.PaymentSalaryDto;
+import com.longkubi.qlns.model.dto.ResponseData;
+import com.longkubi.qlns.model.dto.SalaryDto;
 import com.longkubi.qlns.model.dto.search.PaymentSalarySearchDto;
-import com.longkubi.qlns.model.dto.search.SalarySearchDto;
-import com.longkubi.qlns.model.dto.search.TimeKeepingSearchDto;
-import com.longkubi.qlns.model.entity.Employee;
 import com.longkubi.qlns.model.entity.PaymentSalary;
-import com.longkubi.qlns.model.entity.TimeKeeping;
 import com.longkubi.qlns.repository.EmployeeRepository;
 import com.longkubi.qlns.repository.PaymentSalaryRepository;
-import com.longkubi.qlns.repository.TimeKeepingRepository;
 import com.longkubi.qlns.security.jwt.JwtProvider;
 import com.longkubi.qlns.service.IPaymentSalaryService;
 import org.modelmapper.ModelMapper;
@@ -40,21 +37,17 @@ public class PaymentSalaryServiceImpl implements IPaymentSalaryService {
     private ModelMapper modelMapper;
     @Autowired
     private JwtProvider jwtProvider;
-
     @Autowired
     private EntityManager manager;
-
 
     @Override
     public ResponseData<PaymentSalaryDto> create(SalaryDto salaryDto, String token) {
         return null;
     }
-
     @Override
     public ResponseData<PaymentSalaryDto> update(SalaryDto salaryDto, UUID id, String token) {
         return null;
     }
-
     @Override
     public ResponseData<List<PaymentSalaryDto>> getAll() {
         //  List<PaymentSalary> paymentSalaries = repo.findAll();
@@ -63,8 +56,6 @@ public class PaymentSalaryServiceImpl implements IPaymentSalaryService {
         return new ResponseData<>(paymentSalaries.stream().map(dto -> modelMapper.map(dto, PaymentSalaryDto.class)).collect(Collectors.toList()));
 
     }
-
-
     @Override
     public ResponseData<Boolean> deleteById(UUID id) {
         if (Boolean.TRUE.equals(repo.existsPaymentSalaryById(id))) {
@@ -74,7 +65,6 @@ public class PaymentSalaryServiceImpl implements IPaymentSalaryService {
             return new ResponseData<>(ID_NOT_EXIST, false);
         }
     }
-
     @Override
     public ResponseData<List<PaymentSalaryDto>> getAllPaymentSalaryByEmployeeId(UUID id) {
         List<PaymentSalary> paymentSalaries = repo.getAllPaymentSalaryByEmployeeId(id);
@@ -82,7 +72,6 @@ public class PaymentSalaryServiceImpl implements IPaymentSalaryService {
         return new ResponseData<>(paymentSalaries.stream().map(dto ->
                 modelMapper.map(dto, PaymentSalaryDto.class)).collect(Collectors.toList()));
     }
-
     @Override
     public ResponseData<Page<PaymentSalaryDto>> searchByDto(PaymentSalarySearchDto searchDto) {
         if (Objects.isNull(searchDto)) return new ResponseData<>(OBJECT_CANNOT_EMPTY, null);
@@ -116,7 +105,6 @@ public class PaymentSalaryServiceImpl implements IPaymentSalaryService {
         if (result.isEmpty()) return new ResponseData<>(SUCCESS, new PageImpl<>(new ArrayList<>()));
         return new ResponseData<>(result);
     }
-
     private String genOrderByClause(PaymentSalarySearchDto dto) {
         if (dto.getOrderByFilter() != null && StringUtils.hasText(dto.getOrderByFilter())) {
             switch (dto.getOrderByFilter()) {
