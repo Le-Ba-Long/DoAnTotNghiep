@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
@@ -20,6 +21,8 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "tbl_position")
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Position implements Serializable {
     @Transient
     private static final long serialVersionUID = 4559994432567537044L;
@@ -29,26 +32,19 @@ public class Position implements Serializable {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "id")
     private UUID id;
-
     @Column(name = "code")
     private String code;
-
     @Column(name = "name")
     private String name;
-
     @Column(name = "description")
     @Lob
     private String description;
-
     @Column(name = "creator")
     String creator;
-
     @Column(name = "date_created")
     Date dateCreated;
-
     @Column(name = "changed_by")
     String changedBy;
-
     @Column(name = "date_change")
     Date dateChange;
 

@@ -125,7 +125,10 @@ export default function ListCommendationAndDiscipline() {
         if (res.data.statusCode === 200) {
           setLoading(false);
           setListCommendationAndDiscipline(
-            res.data.data.filter((item) => item?.status === 4 || item?.status === 5)
+            res.data.data.filter(
+              (item) =>
+                (item?.status === 4 || item?.status === 5) && (item?.type === 1 || item?.type === 2)
+            )
           );
         } else {
           setLoading(false);
@@ -150,7 +153,7 @@ export default function ListCommendationAndDiscipline() {
         <Breadcrumb
           routeSegments={[
             { name: 'Phê duyệt', path: '/leader' },
-            { name: 'Khen thưởng - Kỷ luật' },
+            { name: 'Quyết định Khen thưởng - Kỷ luật' },
           ]}
         />
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>

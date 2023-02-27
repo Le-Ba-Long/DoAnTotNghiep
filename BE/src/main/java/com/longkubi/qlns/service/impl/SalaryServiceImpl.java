@@ -52,8 +52,6 @@ public class SalaryServiceImpl implements ISalaryService {
         entity.setDateCreated(new Date());
         return new ResponseData<>(modelMapper.map(repo.save(entity), SalaryDto.class));
     }
-
-
     @Override
     public ResponseData<SalaryDto> update(SalaryDto salaryDto, UUID id, String token) {
         ErrorMessage errorMessage = validateLanguage(salaryDto, id, Constant.Update);
@@ -67,7 +65,6 @@ public class SalaryServiceImpl implements ISalaryService {
         entity.setDateChange(new Date());
         return new ResponseData<>(modelMapper.map(repo.save(entity), SalaryDto.class));
     }
-
     @Override
     public ResponseData<List<SalaryDto>> getAll() {
         List<Salary> salaries = repo.findAll();
@@ -205,7 +202,7 @@ public class SalaryServiceImpl implements ISalaryService {
     public ResponseData<Boolean> deleteById(UUID id, String token) {
         if (Boolean.TRUE.equals(repo.existsSalaryById(id))) {
             repo.deleteById(id);
-            return new ResponseData<>(SUCCESS,true);
+            return new ResponseData<>(SUCCESS, true);
         } else {
             return new ResponseData<>(ID_NOT_EXIST, false);
         }

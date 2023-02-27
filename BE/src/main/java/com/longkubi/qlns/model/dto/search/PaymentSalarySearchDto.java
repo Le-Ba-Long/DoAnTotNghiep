@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -13,25 +14,18 @@ import java.util.UUID;
 @Getter
 @Setter
 public class PaymentSalarySearchDto extends SearchDto {
-    private Integer month;
-
-    private Integer year;
-
-    private Double advancePayment;//Tạm Ứng
+    private Byte month;
+    private Short year;
+    private Float advancePayment;//Tạm Ứng
 
 //    private Long bonus;//Thưởng
 //
 //    private Long punish;//Phạt
-
-    private Integer status;//trạng thái
-
-    private Double insuranceDeductible;//Khấu Trừ Bảo Hiểm
-
-    private Double netWage;//Lương Thực Lĩnh
-
+    private Byte status;//trạng thái
+    private Float insuranceDeductible;//Khấu Trừ Bảo Hiểm
+    private BigDecimal netWage;//Lương Thực Lĩnh
     private UUID employeeId;//mã Nhân Viên
 //    private EmployeeDto employee;
-
     private TimeKeepingDto timeKeeping;//Mã Công
 
 }

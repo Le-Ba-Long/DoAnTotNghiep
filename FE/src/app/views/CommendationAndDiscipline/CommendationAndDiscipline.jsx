@@ -15,11 +15,13 @@ import LoopIcon from '@mui/icons-material/Loop';
 import CommendationAndDisciplineDialog from './CommendationAndDisciplineDialog';
 import ConfirmationDialog from '../../components/ConfirmationDialog';
 import { checkStatus } from 'app/constant';
+import EmployeeTable from './EmployeeTable';
 
 export default function CommendationAndDiscipline() {
   const [listCommendationAndDiscipline, setListCommendationAndDiscipline] = useState([]);
   const [shouldOpenDialog, setShouldOpenDialog] = useState(false);
   const [shouldOpenViewDialog, setShouldOpenViewDialog] = useState(false);
+  const [shouldOpenEmployeeTable, setShouldOpenEmployeeTable] = useState(false);
   const [shouldOpenConfirmDialog, setShouldOpenConfirmDialog] = useState(false);
   const [item, setItem] = useState({});
   const [loading, setLoading] = useState(false);
@@ -148,7 +150,11 @@ export default function CommendationAndDiscipline() {
       .then((res) => {
         if (res.data.statusCode === 200) {
           setLoading(false);
-          setListCommendationAndDiscipline(res.data.data);
+          setListCommendationAndDiscipline(
+            res.data.data.filter(
+              (item) => item?.status === 1 && (item?.type === 1 || item?.type === 2)
+            )
+          );
         } else {
           setLoading(false);
           toast.warning('Lỗi xác thực!');
@@ -175,6 +181,7 @@ export default function CommendationAndDiscipline() {
     setShouldOpenDialog(false);
     setShouldOpenViewDialog(false);
     setShouldOpenConfirmDialog(false);
+    setShouldOpenEmployeeTable(false);
     updatePageData();
     setItem({});
   };
@@ -193,7 +200,7 @@ export default function CommendationAndDiscipline() {
             color="primary"
             size="medium"
             style={{ margin: '20px 0', padding: '5px 20px' }}
-            onClick={() => setShouldOpenDialog(true)}
+            onClick={() => setShouldOpenEmployeeTable(true)}
           >
             Thêm
           </Button>
@@ -245,12 +252,8 @@ export default function CommendationAndDiscipline() {
           />
         </div>
       </Box>
-      {shouldOpenDialog && (
-        <CommendationAndDisciplineDialog
-          open={shouldOpenDialog}
-          handleClose={handleClose}
-          item={item}
-        />
+      {shouldOpenEmployeeTable && (
+        <EmployeeTable open={shouldOpenEmployeeTable} handleClose={handleClose} />
       )}
       {shouldOpenConfirmDialog && (
         <ConfirmationDialog
@@ -263,12 +266,22 @@ export default function CommendationAndDiscipline() {
           No="Hủy"
         />
       )}
+      {shouldOpenDialog && (
+        <CommendationAndDisciplineDialog
+          open={shouldOpenDialog}
+          handleClose={handleClose}
+          item={item}
+          handleCloseDialog={() => setShouldOpenDialog(false)}
+        />
+      )}
+
       {shouldOpenViewDialog && (
         <CommendationAndDisciplineDialog
           open={shouldOpenViewDialog}
           readOnly={shouldOpenViewDialog}
           handleClose={handleClose}
           item={item}
+          handleCloseDialog={() => setShouldOpenViewDialog(false)}
         />
       )}
     </>

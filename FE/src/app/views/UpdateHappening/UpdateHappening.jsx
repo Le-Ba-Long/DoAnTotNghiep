@@ -45,6 +45,7 @@ export default function UpdateHappening() {
               setShouldOpenDialog(true);
               setItem(rowData);
             }}
+            disabled={rowData?.status === 15}
           >
             <RemoveRedEyeIcon />
           </IconButton>

@@ -23,6 +23,6 @@ public interface DepartmentRepository extends JpaRepository<Department, UUID> {
 
     Department getDepartmentById(UUID id);
 
-    @Query("select e from Department e ORDER BY e.dateCreated ASC  ")
+    @Query("select e from Department e ORDER BY e.dateCreated DESC  ")
     List<Department> getAll();
 }

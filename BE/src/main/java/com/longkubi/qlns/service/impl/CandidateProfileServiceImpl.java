@@ -7,13 +7,18 @@ import com.longkubi.qlns.model.dto.RecruitDto;
 import com.longkubi.qlns.model.dto.ResponseData;
 import com.longkubi.qlns.model.dto.search.CandidateProfileSearchDto;
 import com.longkubi.qlns.model.entity.CandidateProfile;
+import com.longkubi.qlns.model.entity.Employee;
+import com.longkubi.qlns.model.entity.EmployeeHistory;
 import com.longkubi.qlns.model.entity.Recruit;
 import com.longkubi.qlns.repository.CandidateProfileRepository;
+import com.longkubi.qlns.repository.EmployeeHistoryRepository;
+import com.longkubi.qlns.repository.EmployeeRepository;
 import com.longkubi.qlns.security.jwt.JwtProvider;
-import com.longkubi.qlns.service.ICandidateProfileService;
-import com.longkubi.qlns.service.IRecruitService;
+import com.longkubi.qlns.service.*;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -24,15 +29,18 @@ import org.springframework.util.StringUtils;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static com.longkubi.qlns.common.Constant.StatusType.FINISHED;
+import static com.longkubi.qlns.common.Constant.StatusType.*;
 import static com.longkubi.qlns.common.ErrorMessage.*;
 import static com.longkubi.qlns.model.dto.CandidateProfileDto.convertFromEntityToDto;
 
 @Transactional
 @Service
+@Slf4j
 public class CandidateProfileServiceImpl implements ICandidateProfileService {
     @Autowired
     private CandidateProfileRepository repo;
@@ -43,6 +51,13 @@ public class CandidateProfileServiceImpl implements ICandidateProfileService {
 
     @Autowired
     private IRecruitService recruitService;
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
+    @Autowired
+    private IEmailService iEmailService;
+    @Autowired
+    private EmployeeHistoryRepository employeeHistoryRepository;
 
     @Autowired
     private EntityManager manager;
@@ -62,6 +77,7 @@ public class CandidateProfileServiceImpl implements ICandidateProfileService {
 //        }
 
         modelMapper.map(candidateProfileDto, entity);
+        // insertEmployeeHistory(candidateProfileDto);
         // entity.setImage(fileName);
         entity.setRecruit(recruitService.getAllRecruit(candidateProfileDto.getRecruitDtos().stream().map(recruitDto -> recruitDto.getId()).collect(Collectors.toList())));
         entity.setCreator(jwtProvider.getUserNameFromToken(token));
@@ -75,11 +91,38 @@ public class CandidateProfileServiceImpl implements ICandidateProfileService {
         return new ResponseData<>(convertFromEntityToDto(repo.save(entity)));
     }
 
+    private void insertEmployeeHistory(CandidateProfileDto candidateProfileDto) {
+        EmployeeHistory employeeHistory = new EmployeeHistory();
+        if (candidateProfileDto.getStatus() == PENDING_TREATMENT.getType()) {
+            employeeHistory.setDate(new Date());
+            if (StringUtils.hasText(candidateProfileDto.getRecruitDtos().get(0).getTitleRecruit())) {
+                employeeHistory.setEvent("Ứng Tuyển Vị Trí: " + candidateProfileDto.getRecruitDtos().get(0).getTitleRecruit());
+            }
+            employeeHistory.setStatus(PENDING_TREATMENT.getType());
+        } else if (candidateProfileDto.getStatus() == WAITING_FOR_INTERVIEW.getType()) {
+            employeeHistory.setDate(candidateProfileDto.getInterviewDate());
+            employeeHistory.setEvent("Hẹn Phỏng Vấn Vị Trí: " + candidateProfileDto.getRecruitDtos().get(0).getTitleRecruit());
+            employeeHistory.setStatus(PASS.getType());
+        } else if (candidateProfileDto.getStatus() == PASS.getType()) {
+            employeeHistory.setDate(candidateProfileDto.getInterviewDate());
+            employeeHistory.setEvent("Đã Pass Phỏng Vấn Vị Trí: " + candidateProfileDto.getRecruitDtos().get(0).getTitleRecruit());
+            employeeHistory.setStatus(PASS.getType());
+        } else if (candidateProfileDto.getStatus() == CANDIDATE_PROFILE_CONVERSION.getType()) {
+            employeeHistory.setDate(new Date());
+            employeeHistory.setEvent("Chuyển Đổi Sang Hồ Sơ Nhân Viên Thử Việc Vị Trí: " + candidateProfileDto.getRecruitDtos().get(0).getTitleRecruit());
+            employeeHistory.setStatus(CANDIDATE_PROFILE_CONVERSION.getType());//chuyển hồ sơ ứng viên khi đậu phỏng vấn sang hồ sơ nhân viên
+        }
+        employeeHistory.setEmployeeHistory(employeeRepository.getEmployeeById(UUID.fromString("303cb4cc-0c77-4b92-a030-4d9739fb8eae")));
+        employeeHistoryRepository.save(employeeHistory);
+    }
+
 
     @Override
     public ResponseData<CandidateProfileDto> update(CandidateProfileDto candidateProfileDto, UUID id, String token) {
         ErrorMessage errorMessage = validateCandidateProfile(candidateProfileDto, id, Constant.Update);
         if (!errorMessage.equals(SUCCESS)) return new ResponseData<>(errorMessage, null);
+        long startTime = System.currentTimeMillis();
+        log.info(String.valueOf(startTime));
         CandidateProfile entity = repo.getCandidateProfileById(id);
         entity.setCode(candidateProfileDto.getCode());
         entity.setFullName(candidateProfileDto.getFullName());
@@ -94,35 +137,106 @@ public class CandidateProfileServiceImpl implements ICandidateProfileService {
         entity.setRefusalReason(candidateProfileDto.getRefusalReason());
         entity.setInterviewer(candidateProfileDto.getInterviewer());
         entity.setInterviewDate(candidateProfileDto.getInterviewDate());
-        entity.setImage(candidateProfileDto.getImage());
+        entity.setWorkingExperience(candidateProfileDto.getWorkingExperience());
+        entity.setCareerGoals(candidateProfileDto.getCareerGoals());
+        entity.setSkill(candidateProfileDto.getSkill());
+        entity.setHobby(candidateProfileDto.getHobby());
+        if (StringUtils.hasText(candidateProfileDto.getImage())) {
+            entity.setImage(candidateProfileDto.getImage());
+        }
         entity.setImageName(candidateProfileDto.getImageName());
+        if (candidateProfileDto.getStatus() == WAITING_FOR_INTERVIEW.getType()
+                || candidateProfileDto.getStatus() == PASS.getType()
+                || candidateProfileDto.getStatus() == PENDING_TREATMENT.getType()
+                || candidateProfileDto.getStatus() == CANDIDATE_PROFILE_CONVERSION.getType()) {
+            //    insertEmployeeHistory(candidateProfileDto);
+
+        }
+        if (candidateProfileDto.getStatus().equals(WAITING_FOR_INTERVIEW.getType())) {
+            String titleRecruit = candidateProfileDto.getRecruitDtos().get(0).getTitleRecruit();
+            SimpleDateFormat outputFormatter = new SimpleDateFormat("h.mm a 'ngày' dd/MM/yyyy");
+            String output = outputFormatter.format(candidateProfileDto.getInterviewDate());
+            String interviewer = candidateProfileDto.getInterviewer();
+            StringBuilder content = new StringBuilder();
+            content.append("Dear Các bạn ứng viên,\n").append("\n Đầu tiên, công ty TNHH Kĩ Thuật Đại Dương(Ocentech) cảm ơn bạn đã quan tâm tới thông tin tuyển dụng vị trí ")
+                    .append(titleRecruit).append(" của chúng tôi. Sau khi xem qua CV ứng tuyển, chúng tôi nhận thấy bạn là một ứng viên tiềm năng, phù hợp với vị trí mà chúng tôi đang tìm kiếm.\n\n")
+                    .append("Chúng tôi mời bạn tham gia buổi phỏng vấn vào lúc ")
+                    .append(output).append(" Người Phỏng Vấn Là: ")
+                    .append(interviewer).append(" tại địa chỉ số 23 ngõ 371 Đê La Thành, phường Ô Chợ Dừa, quận Đống Đa, Hà Nội (Hoặc có thể đi vào từ ngõ 5 Láng Hạ, đi thẳng đến ngã 3 trường học Nguyễn Trường Tộ là đến)\n\n")
+                    .append("Khi nhận được Email này, bạn vui lòng xác nhận lại lịch phỏng vấn qua Email hoặc liên hệ trực tiếp với Ms.Liên- 037.514.4567 để được hỗ trợ.\n\n")
+                    .append("Chúc bạn một ngày làm việc hiệu quả!\n\n\n\n\n\n")
+                    .append("Best Regards,\n\n Nguyễn Liên\n\n\n\n\n\n Công ty TNHH Giải pháp EnterpriseNao\n\n").append(
+                            "Address: Số 23 ngõ 371 Đê La Thành, p.Ô Chợ Dừa, q.Đống Đa, Hà Nội\n\nPhòng Hành chính nhân sự\n\n")
+                    .append("Ms.Liên-037.514.4567\n\n Website: http://enterprisenao.com");
+            iEmailService.sendEmail(candidateProfileDto.getEmail(), titleRecruit, content.toString());
+        }
+        Set<Recruit> recruitSet = entity.getRecruit().stream().map(e -> modelMapper.map(e, Recruit.class)).collect(Collectors.toSet());
+        Recruit recruitRevert = null;
+        UUID revert = null;
+        if (recruitSet.size() > 0) {
+            for (Recruit r : recruitSet) {
+                recruitRevert = r;
+            }
+            revert = recruitRevert.getId();
+        }
         //  entity.setRecruit(recruitService.getAllRecruit(candidateProfileDto.getRecruitDtos().stream().map(recruitDto -> recruitDto.getId()).collect(Collectors.toList())));
         Set<Recruit> recruits = recruitService.getAllRecruit(candidateProfileDto.getRecruitDtos().stream().map(RecruitDto::getId).collect(Collectors.toList()));
         entity.getRecruit().clear();
         entity.getRecruit().addAll(recruits);
         // Set<Recruit> recruit = recruitService.getAllRecruit(candidateProfileDto.getRecruitDtos().stream().map(RecruitDto::getId).collect(Collectors.toList()));
         //recruit.stream().forEach(dto ->dto.setCandidateProfiles(entity));
-
         //entity.setRecruit(candidateProfileDto.getRecruitDtos().stream().map(recruitDto -> recruitService.getRecruitById(recruitDto.getId())).collect(Collectors.toList()));
         entity.setChangedBy(jwtProvider.getUserNameFromToken(token));
         entity.setDateChange(new Date());
-        Recruit recruit = recruitService.getRecruitById(candidateProfileDto.getRecruitDtos().get(0).getId());
-        int quantity = recruit.getQuantity();
-        int numberOfApplicants = recruit.getCandidateProfiles().size();
-        if ((quantity - numberOfApplicants) == 1) {
-            recruit.setStatus(FINISHED.getType());
+        if (candidateProfileDto.getRecruitDtos().size() > 0) {
+            Recruit recruit = recruitService.getRecruitById(candidateProfileDto.getRecruitDtos().get(0).getId());
+            int quantity = recruit.getQuantity();
+            int numberOfApplicants = recruit.getCandidateProfiles().size();
+            if ((quantity - numberOfApplicants) == 1) {
+                recruit.setStatus(FINISHED.getType());
+            }
+            // lấy ra  kế hoạch tuyển dụng hiện tại của ứng viên đang ứng tuyển chưa cập nhập
+            // kế hoạch tuyển dụng đã kết thúc.
+            // nếu có một ứng viên vẫn đang chờ xử lí của kế hoạch
+            // đó  mà thay đổi sang một kế hoạch khác sẽ cập nhập lại
+            // trạng thái cho kế hoạch đã kết thúc thành đang thực hiện
+            // thay cho vị trí của ứng viên vừa thay đổi
+            UUID norevert = candidateProfileDto.getRecruitDtos().get(0).getId();
+
+            if (revert != null) {
+                if (recruitRevert.getStatus() == FINISHED.getType() && !revert.equals(norevert)) {
+                    //    && recruitRevert.getId() != candidateProfileDto.getRecruitDtos().get(0).getId()) {
+                    recruitRevert.setStatus(PROCESSING.getType());
+                    recruitService.update(modelMapper.map(recruitRevert, RecruitDto.class), recruitRevert.getId(), token);
+                }
+            }
         }
         CandidateProfile dto = repo.save(entity);
+        long endTime = System.currentTimeMillis();
+        long elapsedTime = endTime - startTime;
+        log.info("Tổng Thời gian call test: " + String.valueOf(elapsedTime));
         return new ResponseData<>(convertFromEntityToDto(dto));
     }
 
-    @Override
+        @Override
     public ResponseData<List<CandidateProfileDto>> getAll() {
         // List<CandidateProfile> candidateProfiles = repo.findAll();
         List<CandidateProfile> candidateProfiles = repo.getAll();
         if (candidateProfiles.isEmpty()) return new ResponseData<>(SUCCESS, new ArrayList<>());
         return new ResponseData<>(SUCCESS, candidateProfiles.stream().map(CandidateProfileDto::convertFromEntityToDto).collect(Collectors.toList()));
     }
+//    public ResponseData<List<CandidateProfileDto>> getAll() {
+//        Stream<CandidateProfile> candidateProfileStream = repo.getAll();
+//        List<CandidateProfileDto> candidateProfileDtos = candidateProfileStream
+//                .map(CandidateProfileDto::convertFromEntityToDto)
+//                .collect(Collectors.toList());
+//        if (candidateProfileDtos.isEmpty()) {
+//            return new ResponseData<>(SUCCESS, new ArrayList<>());
+//        } else {
+//            return new ResponseData<>(SUCCESS, candidateProfileDtos);
+//        }
+//    }
+
 
     /**
      * Hàm Tìm Kiếm Chức Vụ Theo Điều Kiện Tìm Kiếm Truyền Vào
@@ -163,7 +277,6 @@ public class CandidateProfileServiceImpl implements ICandidateProfileService {
         if (result.isEmpty()) return new ResponseData<>(LIST_IS_EMPTY, null);
         return new ResponseData<>(result);
     }
-
 
     private String genOrderByClause(CandidateProfileSearchDto dto) {
         if (dto.getOrderByFilter() != null && StringUtils.hasText(dto.getOrderByFilter())) {

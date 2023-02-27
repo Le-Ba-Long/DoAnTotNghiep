@@ -2,10 +2,8 @@ package com.longkubi.qlns.service.impl;
 
 import com.longkubi.qlns.common.Constant;
 import com.longkubi.qlns.common.ErrorMessage;
-import com.longkubi.qlns.model.dto.EmployeeDto;
 import com.longkubi.qlns.model.dto.ResponseData;
 import com.longkubi.qlns.model.dto.TimeKeepingDto;
-import com.longkubi.qlns.model.dto.search.EmployeeSearchDto;
 import com.longkubi.qlns.model.dto.search.TimeKeepingSearchDto;
 import com.longkubi.qlns.model.entity.Contract;
 import com.longkubi.qlns.model.entity.Employee;
@@ -26,7 +24,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PrePersist;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.*;
@@ -52,6 +52,33 @@ public class TimeKeepingServiceImpl implements ITimeKeepingService {
     @Autowired
     private EntityManager manager;
 
+    @PrePersist
+    public String generateCode() {
+
+        // Tạo mã mới ngẫu nhiên từ 0001 đến 9999
+        String nextCode = String.format("MaCC%04d", new Random().nextInt(9999) + 1);
+        // Kiểm tra tính duy nhất của mã
+        while (!isCodeUnique(nextCode)) {
+            nextCode = String.format("MaCC%04d", new Random().nextInt(9999) + 1);
+        }
+        return nextCode;
+    }
+
+    // Phương thức kiểm tra tính duy nhất của mã
+    private boolean isCodeUnique(String code) {
+        // Sử dụng EntityManager để kiểm tra tính duy nhất của mã trong cơ sở dữ liệu
+        try {
+            // Tìm đối tượng TimeKeeping có trường code bằng với code được truyền vào
+            TypedQuery<TimeKeeping> query = manager.createQuery("SELECT tk FROM TimeKeeping tk WHERE tk.code = :code", TimeKeeping.class);
+            query.setParameter("code", code);
+            List<TimeKeeping> result = query.getResultList();
+            // Nếu không có bản ghi nào có cùng mã, trả về true
+            return result.isEmpty();
+        } finally {
+            manager.close();
+        }
+    }
+
     @Override
     public ResponseData<TimeKeepingDto> create(TimeKeepingDto timeKeepingDto, String token) {
 
@@ -59,11 +86,12 @@ public class TimeKeepingServiceImpl implements ITimeKeepingService {
         if (!errorMessage.equals(SUCCESS)) return new ResponseData<>(errorMessage, null);
         TimeKeeping entity = new TimeKeeping();
         modelMapper.map(timeKeepingDto, entity);
+        entity.setCode(generateCode());
         Employee employee = employeRepo.getEmployeeById(timeKeepingDto.getEmployee().getId());
         Contract contractDto = employee.getContract();
-        Long hourlyRate = contractDto.getHourlyRate();// số tiền tính cho 1 giờ làm thêm
-        Double coefficientSalary = contractDto.getCoefficientSalary();//hệ số lương
-        Long basicSalary = contractDto.getBasicSalary();//mức lương cơ bản
+        int hourlyRate = contractDto.getHourlyRate();// số tiền tính cho 1 giờ làm thêm
+        float coefficientSalary = contractDto.getCoefficientSalary();//hệ số lương
+        int basicSalary = contractDto.getBasicSalary();//mức lương cơ bản
         //Tính Lương
         PaymentSalary paymentSalary = salaryCalculation(entity, timeKeepingDto, basicSalary, coefficientSalary, hourlyRate, token, Constant.Insert);
         paymentSalary.setTimeKeeping(repo.save(entity));
@@ -91,9 +119,9 @@ public class TimeKeepingServiceImpl implements ITimeKeepingService {
         entity.setStatus(timeKeepingDto.getStatus());
         Employee employee = employeRepo.getEmployeeById(timeKeepingDto.getEmployee().getId());
         Contract contractDto = employee.getContract();
-        Long hourlyRate = contractDto.getHourlyRate();// số tiền tính cho 1 giờ làm thêm
-        Double coefficientSalary = contractDto.getCoefficientSalary();//hệ số lương
-        Long basicSalary = contractDto.getBasicSalary();//mức lương cơ bản
+        int hourlyRate = contractDto.getHourlyRate();// số tiền tính cho 1 giờ làm thêm
+        float coefficientSalary = contractDto.getCoefficientSalary();//hệ số lương
+        int basicSalary = contractDto.getBasicSalary();//mức lương cơ bản
         // tính lương
         entity.setPaymentSalary(salaryCalculation(entity, timeKeepingDto, basicSalary, coefficientSalary, hourlyRate, token, Constant.Update));
         //kết thúc tính lương
@@ -288,27 +316,27 @@ public class TimeKeepingServiceImpl implements ITimeKeepingService {
         return SUCCESS;
     }
 
-    private double getTheValueOfpPersonalIncomeTax(BigDecimal totalIncome) {
+    private float getTheValueOfpPersonalIncomeTax(BigDecimal totalIncome) {
         if (totalIncome.compareTo(BigDecimal.valueOf(5000000)) < 0) {
-            return 0.0;//0%
+            return 0.0F;//0%
         } else if (totalIncome.compareTo(BigDecimal.valueOf(5000000)) >= 0 && totalIncome.compareTo(BigDecimal.valueOf(10000000)) < 0) {
-            return 0.05;//5%
+            return 0.05F;//5%
         } else if (totalIncome.compareTo(BigDecimal.valueOf(10000000)) >= 0 && totalIncome.compareTo(BigDecimal.valueOf(18000000)) < 0) {
-            return 0.1;//10%
+            return 0.1F;//10%
         } else if (totalIncome.compareTo(BigDecimal.valueOf(18000000)) >= 0 && totalIncome.compareTo(BigDecimal.valueOf(32000000)) < 0) {
-            return 0.15;//15%
+            return 0.15F;//15%
         } else if (totalIncome.compareTo(BigDecimal.valueOf(32000000)) >= 0 && totalIncome.compareTo(BigDecimal.valueOf(52000000)) < 0) {
-            return 0.2;//20%
+            return 0.2F;//20%
         } else if (totalIncome.compareTo(BigDecimal.valueOf(52000000)) >= 0 && totalIncome.compareTo(BigDecimal.valueOf(80000000)) < 0) {
-            return 0.25;//25%
+            return 0.25F;//25%
         } else {
-            return 0.3;//30%
+            return 0.3F;//30%
         }
 
     }
 
     // tính lương cho nhân viên
-    private PaymentSalary salaryCalculation(TimeKeeping entity, TimeKeepingDto timeKeepingDto, Long basicSalary, Double coefficientSalary, Long hourlyRate, String token, String action) {
+    private PaymentSalary salaryCalculation(TimeKeeping entity, TimeKeepingDto timeKeepingDto, int basicSalary, float coefficientSalary, int hourlyRate, String token, String action) {
         //Tính Lương
         PaymentSalary paymentSalary;
         if (Constant.Insert.equals(action)) {
@@ -327,7 +355,7 @@ public class TimeKeepingServiceImpl implements ITimeKeepingService {
         //long insurance = 800000L;// tiền bảo hiểm
         BigDecimal totalSalary = new BigDecimal("0.0");
         if (timeKeepingDto.getNumberWorkDay() != null) {
-            Integer numberWorkDay = timeKeepingDto.getNumberWorkDay();// Số ngày công đi làm
+            byte numberWorkDay = timeKeepingDto.getNumberWorkDay();// Số ngày công đi làm
             totalSalary = totalSalary.add(new BigDecimal(numberWorkDay * payForOneDayOfWork));// tính tiền cho tổng số ngày công đi làm trong tháng
             // totalSalary = (double) (numberWorkDay * payForOneDayOfWork);// tính tiền cho số ngày công đi làm trong tháng
             if (numberWorkDay == 23) {
@@ -339,14 +367,14 @@ public class TimeKeepingServiceImpl implements ITimeKeepingService {
                 paymentSalary.setFullTimeSalary(0);
             }
             if (timeKeepingDto.getNumberDayOff() != 0) {
-                Integer numberDayOff = timeKeepingDto.getNumberDayOff();// Số ngày nghỉ có phép
+                byte numberDayOff = timeKeepingDto.getNumberDayOff();// Số ngày nghỉ có phép
                 if (numberDayOff <= 3) {
                     totalSalary = totalSalary.add(new BigDecimal((numberDayOff * payForOneDayOfWork) * 0.5));// tính tiền lương hưởng 50% cho ngày nghỉ phép
                     //totalSalary += (numberDayOff * payForOneDayOfWork * 0.5);// tính tiền lương hưởng 50% cho ngày nghỉ phép
                 }
             }
             if (timeKeepingDto.getNumberDayUnexcusedLeave() != 0) {
-                Integer numberDayUnexcusedLeave = timeKeepingDto.getNumberDayUnexcusedLeave();// Số ngày nghỉ không phép
+                byte numberDayUnexcusedLeave = timeKeepingDto.getNumberDayUnexcusedLeave();// Số ngày nghỉ không phép
                 if (numberDayUnexcusedLeave <= 2) {
                     totalSalary = totalSalary.add(new BigDecimal(subsidize));//tính thêm tiền trợ cấp nếu nghỉ không quá 2 ngày nghỉ không phép
                     paymentSalary.setTransportationAndLunchAllowance(subsidize);
@@ -361,18 +389,18 @@ public class TimeKeepingServiceImpl implements ITimeKeepingService {
                 // totalSalary += subsidize;//tính thêm tiền trợ cấp
             }
             if (timeKeepingDto.getNumberOvertimeHours() != 0) {
-                Integer numberOvertimeHours = timeKeepingDto.getNumberOvertimeHours();//số giờ làm tăng ca
+                short numberOvertimeHours = timeKeepingDto.getNumberOvertimeHours();//số giờ làm tăng ca
                 totalSalary = totalSalary.add(new BigDecimal(numberOvertimeHours * hourlyRate));
                 // totalSalary += numberOvertimeHours * hourlyRate;
             }
         }
         //// tổng lương đi làm dc nhân với hệ số lương trong hợp đồng
         totalSalary = totalSalary.multiply(new BigDecimal(coefficientSalary));
-        double valueAddedWithEachSalary = getTheValueOfpPersonalIncomeTax(totalSalary);// giá trị gia tăng thuế thu nhập cá nhân dựa vào mức lương của nhân viên
-        double socialInsuranceCosts = totalSalary.doubleValue() * 0.08;// tính tiền bảo hiểm xã hội 8% tổng thu  nhập của nhân viên
-        double healthInsurancePremium = totalSalary.doubleValue() * 0.015;// tính tiền bảo hiểm y tế 1.5% tổng thu  nhập của nhân viên
+        float valueAddedWithEachSalary = getTheValueOfpPersonalIncomeTax(totalSalary);// giá trị gia tăng thuế thu nhập cá nhân dựa vào mức lương của nhân viên
+        float socialInsuranceCosts = totalSalary.floatValue() * 0.08F;// tính tiền bảo hiểm xã hội 8% tổng thu  nhập của nhân viên
+        float healthInsurancePremium = totalSalary.floatValue() * 0.015F;// tính tiền bảo hiểm y tế 1.5% tổng thu  nhập của nhân viên
 
-        double personalIncomeTax = (totalSalary.doubleValue() - socialInsuranceCosts - healthInsurancePremium) * valueAddedWithEachSalary;
+        float personalIncomeTax = (totalSalary.floatValue() - socialInsuranceCosts - healthInsurancePremium) * valueAddedWithEachSalary;
         // tính tổng lương  thực lĩnh = tổng thu nhập - bảo hiểm xã hội - bảo hiểm y tế - thuế thu nhập cá nhân ;
         BigDecimal netWage = totalSalary.subtract(new BigDecimal(socialInsuranceCosts)).subtract(new BigDecimal(healthInsurancePremium)).subtract(new BigDecimal(personalIncomeTax));
         // totalSalary = (totalSalary * coefficientSalary) - insurance;//tổng lương nhân với hệ số trừ đi tiền bảo hiểm

@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.longkubi.qlns.common.ErrorMessage.*;
+
 @Transactional
 @Service
 public class DepartmentServiceImpl implements IDepartmentService {
@@ -48,8 +49,6 @@ public class DepartmentServiceImpl implements IDepartmentService {
         entity.setDateCreated(new Date());
         return new ResponseData<>(modelMapper.map(repo.save(entity), DepartmentDto.class));
     }
-
-
     @Override
     public ResponseData<DepartmentDto> update(DepartmentDto departmentDto, UUID id, String token) {
         ErrorMessage errorMessage = validateLanguage(departmentDto, id, Constant.Update);
@@ -62,10 +61,9 @@ public class DepartmentServiceImpl implements IDepartmentService {
         entity.setDateChange(new Date());
         return new ResponseData<>(modelMapper.map(repo.save(entity), DepartmentDto.class));
     }
-
     @Override
     public ResponseData<List<DepartmentDto>> getAll() {
-      //  List<Department> departmentDtos = repo.findAll();
+        //  List<Department> departmentDtos = repo.findAll();
         List<Department> departmentDtos = repo.getAll();
         if (departmentDtos.isEmpty()) return new ResponseData<>(SUCCESS, new ArrayList<>());
         return new ResponseData<>(departmentDtos.stream().map(dto -> modelMapper.map(dto, DepartmentDto.class)).collect(Collectors.toList()));
@@ -205,17 +203,16 @@ public class DepartmentServiceImpl implements IDepartmentService {
 
     @Override
     public ResponseData<Boolean> deleteById(UUID id, String token) {
-       if(id != null){
-           if (Boolean.TRUE.equals(repo.existsDepartmentById(id))) {
-               repo.deleteById(id);
-               return new ResponseData<>(SUCCESS,true);
-           } else {
-               return new ResponseData<>(ID_NOT_EXIST, false);
-           }
-       }
-       else {
-           return new ResponseData<>(DATA_WRONG_FORM,null);
-       }
+        if (id != null) {
+            if (Boolean.TRUE.equals(repo.existsDepartmentById(id))) {
+                repo.deleteById(id);
+                return new ResponseData<>(SUCCESS, true);
+            } else {
+                return new ResponseData<>(ID_NOT_EXIST, false);
+            }
+        } else {
+            return new ResponseData<>(DATA_WRONG_FORM, null);
+        }
     }
 
     private ErrorMessage validateLanguage(DepartmentDto departmentDto, UUID id, String action) {

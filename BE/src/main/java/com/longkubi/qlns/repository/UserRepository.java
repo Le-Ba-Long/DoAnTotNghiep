@@ -11,7 +11,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, UUID> {
+public interface
+UserRepository extends JpaRepository<User, UUID> {
     boolean existsByUserName(String userName);
 
     boolean existsById(UUID id);
@@ -19,8 +20,11 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     boolean existsByEmail(String email);
 
     Optional<User> findByUserName(String userName);
+
     @Query("select e from User e ORDER BY e.id ASC  ")
     List<User> getAll();
+
     boolean existsByUserNameAndAndPassWord(String userName, String passWord);
 
+    User getUserById(UUID uuid);
 }

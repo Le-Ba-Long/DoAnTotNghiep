@@ -74,7 +74,7 @@ export default function TimeKeepingDialog(props) {
         <DialogContent style={{ padding: '0 20px' }}>
           <Grid container spacing={2} style={{ marginTop: 5 }}>
             <Grid container item xs={12} md={12} spacing={2}>
-              <Grid item xs={3} md={3}>
+              {/* <Grid item xs={3} md={3}>
                 <TextValidator
                   label="Mã chấm công"
                   variant="outlined"
@@ -87,7 +87,7 @@ export default function TimeKeepingDialog(props) {
                     'Mã kế hoạch chưa đúng format VD:(MaCC9999)',
                   ]}
                 />
-              </Grid>
+              </Grid> */}
               <Grid item xs={3} md={3}>
                 <TextValidator
                   label="Năm"

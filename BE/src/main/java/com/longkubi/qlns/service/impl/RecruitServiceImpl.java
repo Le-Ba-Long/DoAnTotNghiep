@@ -52,7 +52,6 @@ public class RecruitServiceImpl implements IRecruitService {
         return new ResponseData<>(modelMapper.map(repo.save(entity), RecruitDto.class));
     }
 
-
     @Override
     public ResponseData<RecruitDto> update(RecruitDto recruitDto, UUID id, String token) {
         ErrorMessage errorMessage = validateRecruit(recruitDto, id, Constant.Update);
@@ -77,13 +76,14 @@ public class RecruitServiceImpl implements IRecruitService {
         Recruit entity = null;
         if (Boolean.FALSE.equals(repo.existsRecruitById(id)))
             return new ResponseData<>(ID_NOT_EXIST, null);
-        if(recruitDto.getStatus()==Constant.StatusType.FIX_REQUEST.getType()){
+        if (recruitDto.getStatus() == Constant.StatusType.FIX_REQUEST.getType()) {
             entity = repo.getRecruitById(id);
             entity.setFeedback(recruitDto.getFeedback());
             entity.setStatus(recruitDto.getStatus());
         }
         if (recruitDto.getStatus() == Constant.StatusType.PROCESSING.getType()
-                || recruitDto.getStatus() == Constant.StatusType.REJECT.getType()) {
+                || recruitDto.getStatus() == Constant.StatusType.REJECT.getType()
+                || recruitDto.getStatus() == Constant.StatusType.FIX_REQUEST.getType()) {
             entity = repo.getRecruitById(id);
             entity.setStatus(recruitDto.getStatus());
             return new ResponseData<>(SUCCESS, modelMapper.map(entity, RecruitDto.class));
@@ -93,7 +93,7 @@ public class RecruitServiceImpl implements IRecruitService {
 
     @Override
     public ResponseData<List<RecruitDto>> getAll() {
-      //  List<Recruit> recruits = repo.findAll();
+        //  List<Recruit> recruits = repo.findAll();
         List<Recruit> recruits = repo.getAll();
         if (recruits.isEmpty()) return new ResponseData<>(LIST_IS_EMPTY, null);
         return new ResponseData<>(recruits.stream().map(dto -> modelMapper.map(dto, RecruitDto.class)).collect(Collectors.toList()));
@@ -238,7 +238,7 @@ public class RecruitServiceImpl implements IRecruitService {
     public ResponseData<Boolean> deleteById(UUID id) {
         if (Boolean.TRUE.equals(repo.existsRecruitById(id))) {
             repo.deleteById(id);
-            return new ResponseData<>(SUCCESS,true);
+            return new ResponseData<>(SUCCESS, true);
         } else {
             return new ResponseData<>(ID_NOT_EXIST, false);
         }
@@ -246,12 +246,12 @@ public class RecruitServiceImpl implements IRecruitService {
 
     @Override
     public ResponseData<List<RecruitDto>> getAllApprovalRecruit() {
-        return new ResponseData<>( SUCCESS,repo.getAllApprovalRecruit().stream().map(recruit -> modelMapper.map(recruit,RecruitDto.class)).collect(Collectors.toList()));
+        return new ResponseData<>(SUCCESS, repo.getAllApprovalRecruit().stream().map(recruit -> modelMapper.map(recruit, RecruitDto.class)).collect(Collectors.toList()));
     }
 
 
     @Override
-    public Set<Recruit> getAllRecruit(List<UUID>listIds) {
+    public Set<Recruit> getAllRecruit(List<UUID> listIds) {
         return repo.getAllRecruit(listIds);
     }
 

@@ -65,29 +65,25 @@ public class AuthController {
     @Autowired
     private UserDetailService userDetailService;
 
-    public AuthController(RoleServiceImpl roleService, PasswordEncoder passwordEncoder,
-                          AuthenticationManager authenticationManager, JwtProvider jwtProvider,
-                          UserServiceImpl userService,ModelMapper modelMapper) {
+    public AuthController(RoleServiceImpl roleService, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtProvider jwtProvider, UserServiceImpl userService, ModelMapper modelMapper) {
         this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtProvider = jwtProvider;
         this.userService = userService;
-        this.modelMapper =modelMapper;
+        this.modelMapper = modelMapper;
 
     }
 
     @PostMapping("/signup")
     public ResponseData<?> register(@Valid @RequestBody UserDto userDto) {
         if (userService.existsByUserName(userDto.getUserName())) {
-            return new ResponseData<>(ErrorMessage.THE_USERNAME_IS_EXISTED,null);
+            return new ResponseData<>(ErrorMessage.THE_USERNAME_IS_EXISTED, null);
         }
         if (userService.existsByEmail(userDto.getEmail())) {
             return new ResponseData<>(THE_EMAIL_IS_EXISTED, null);
         }
-        User users = new User(userDto.getFullName(), userDto.getUserName(), userDto.getEmail(),
-                passwordEncoder.encode(userDto.getPassWord()),
-                userDto.getRoles().stream().map(roleDto -> modelMapper.map(roleDto,Role.class)).collect(Collectors.toSet()));
+        User users = new User(userDto.getFullName(), userDto.getUserName(), userDto.getEmail(), passwordEncoder.encode(userDto.getPassWord()), userDto.getRoles().stream().map(roleDto -> modelMapper.map(roleDto, Role.class)).collect(Collectors.toSet()));
 //        Set<String> strRoles = signUpForm.getRoles();
 //        Set<Role> roles = new HashSet<>();
 //        strRoles.forEach(role -> {
@@ -131,39 +127,42 @@ public class AuthController {
     public ResponseEntity<?> login(@Valid @RequestBody SignInForm signInForm) {
 
         try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(signInForm.getUsername(), signInForm.getPassword())
-            );
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInForm.getUsername(), signInForm.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String token = jwtProvider.createToken(authentication);
             UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
-            log.info(String.valueOf(passwordEncoder.matches(signInForm.getPassword(),userPrinciple.getPassword())));
+            log.info(String.valueOf(passwordEncoder.matches(signInForm.getPassword(), userPrinciple.getPassword())));
             return ResponseEntity.ok(new JwtResponse(token, userPrinciple.getFullName(), 200, userPrinciple.getAuthorities()));
         } catch (AuthenticationException e) {
             Map<String, Object> errors = new HashMap<>();
             errors.put("code", 400);
             errors.put("error", "Tên Đăng Nhập Hoặc Mật Khẩu Không Chính Xác !");
             Optional<UserDto> userDto = userService.loadUserByUsername(signInForm.getUsername());
-            log.info(String.valueOf(passwordEncoder.matches(signInForm.getPassword(),userDto.get().getPassWord())));
+            log.info(String.valueOf(passwordEncoder.matches(signInForm.getPassword(), userDto.get().getPassWord())));
             return new ResponseEntity<>(errors, HttpStatus.NOT_FOUND);
         }
 
     }
-    @PostMapping ("/checkToken")
+
+    @PostMapping("/change-password")
+    public ResponseData<Boolean> changePassword(@RequestBody UserDto userDto) {
+        return userService.changPassword(userDto);
+    }
+
+    @PostMapping("/checkToken")
     public ResponseEntity<?> checkToken(@Valid @RequestBody SignInForm signInForm) {
         try {
-                Optional<UserDto> userDto = userService.loadUserByUsername(signInForm.getUsername());
-                Authentication authentication = authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(signInForm.getUsername(),signInForm.getPassword())
-                );
-                UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
-                return  ResponseEntity.ok().body(userPrinciple);
+            Optional<UserDto> userDto = userService.loadUserByUsername(signInForm.getUsername());
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInForm.getUsername(), signInForm.getPassword()));
+            UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
+            return ResponseEntity.ok().body(userPrinciple);
         } catch (Exception e) {
             log.error("Can't set user authentication -> Message: {0}", e);
-            return ResponseEntity.badRequest().body("Can't set user authentication -> Message: {0}"+ e);
+            return ResponseEntity.badRequest().body("Can't set user authentication -> Message: {0}" + e);
         }
 
     }
+
     private String getJwt(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {

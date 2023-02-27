@@ -13,7 +13,7 @@ public interface CommendationAndDisciplineRepository extends JpaRepository<Comme
     Boolean existsCommendationAndDisciplineById(UUID id);
 
 
-    @Query("select e from CommendationAndDiscipline e ORDER BY e.dateCreated ASC  ")
+    @Query("select e from CommendationAndDiscipline e ORDER BY e.dateCreated DESC  ")
     List<CommendationAndDiscipline> getAll();
 
     CommendationAndDiscipline getCommendationAndDisciplineById(UUID id);

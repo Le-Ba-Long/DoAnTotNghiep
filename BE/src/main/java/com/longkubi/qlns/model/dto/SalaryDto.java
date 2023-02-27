@@ -18,28 +18,23 @@ import static com.longkubi.qlns.common.Constant.REGEX_CODE_SALARY;
 @Getter
 @Setter
 public class SalaryDto {
-
     private UUID id;
-    @Pattern(regexp = REGEX_CODE_SALARY,message = "Mã Lương Không Đúng Định Dạng "+ REGEX_CODE_SALARY)
+    @Pattern(regexp = REGEX_CODE_SALARY, message = "Mã Lương Không Đúng Định Dạng " + REGEX_CODE_SALARY)
     private String code;
+    private Integer hourlyRate;//Số tiền tính cho 1h làm thêm
 
-    private long hourlyRate;//Số tiền tính cho 1h làm thêm
-
-    private long salaryLevel;//Mức Lương Cơ Bản
-
-    private double coefficientSalary; //Hệ Số Lương
+    private Integer salaryLevel;//Mức Lương Cơ Bản
+    private Float coefficientSalary; //Hệ Số Lương
 
     //    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
 //    @JoinColumn(name = "employee_code")
 //    private Employee employee;
     private String creator;
-
     private Date dateCreated;
-
     private String changedBy;
-
     private Date dateChange;
-    public  static SalaryDto convertFromEntityToDto(Salary entity){
+
+    public static SalaryDto convertFromEntityToDto(Salary entity) {
         return new ModelMapper().map(entity, SalaryDto.class);
     }
 }

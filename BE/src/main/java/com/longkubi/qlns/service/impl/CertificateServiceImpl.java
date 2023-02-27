@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.longkubi.qlns.common.ErrorMessage.*;
+
 @Transactional
 @Service
 public class CertificateServiceImpl implements ICertificateService {
@@ -68,7 +69,7 @@ public class CertificateServiceImpl implements ICertificateService {
 
     @Override
     public ResponseData<List<CertificateDto>> getAll() {
-      //  List<Certificate> certificates = repo.findAll();
+        //  List<Certificate> certificates = repo.findAll();
         List<Certificate> certificates = repo.getAll();
         if (certificates.isEmpty()) return new ResponseData<>(SUCCESS, new ArrayList<>());
         return new ResponseData<>(certificates.stream().map(dto -> modelMapper.map(dto, CertificateDto.class)).collect(Collectors.toList()));
@@ -245,7 +246,7 @@ public class CertificateServiceImpl implements ICertificateService {
     public ResponseData<Boolean> deleteById(UUID id) {
         if (Boolean.TRUE.equals(repo.existsCertificateById(id))) {
             repo.deleteById(id);
-            return new ResponseData<>(SUCCESS,true);
+            return new ResponseData<>(SUCCESS, true);
         } else {
             return new ResponseData<>(ID_NOT_EXIST, false);
         }
@@ -255,11 +256,11 @@ public class CertificateServiceImpl implements ICertificateService {
         if (Constant.Insert.equals(action)) {
             if (Objects.isNull(certificateDto)) return OBJECT_CANNOT_EMPTY;
             if (Boolean.TRUE.equals(repo.existsCertificateByCode(certificateDto.getCode()))) return CODE_ALREADY_EXIST;
-           // if (Boolean.TRUE.equals(repo.existsCertificateByName(certificateDto.getName()))) return NAME_EXIST;
+            // if (Boolean.TRUE.equals(repo.existsCertificateByName(certificateDto.getName()))) return NAME_EXIST;
         } else {
             if (Objects.isNull(certificateDto)) return OBJECT_CANNOT_EMPTY;
             if (repo.exclusionCode(certificateDto.getCode(), id) > 0) return CODE_ALREADY_EXIST;
-          //  if (repo.exclusionName(certificateDto.getName(), id) > 0) return NAME_EXIST;
+            //  if (repo.exclusionName(certificateDto.getName(), id) > 0) return NAME_EXIST;
         }
         return SUCCESS;
     }

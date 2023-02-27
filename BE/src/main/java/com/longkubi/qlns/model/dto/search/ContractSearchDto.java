@@ -13,15 +13,10 @@ import java.util.Date;
 @Getter
 @Setter
 public class ContractSearchDto extends SearchDto {
-
     private String code;
-
     private Employee employee;
-
     private Date signingDate;
-
     private Date contractEffect;
-
     private String status;
 
 }

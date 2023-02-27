@@ -27,6 +27,6 @@ public interface PositionRepository extends JpaRepository<Position, UUID> {
     @Query("select e from Position e where e.id in :ids")
     Set<Position> getPositionByListId(@Param("ids") Set<UUID> ids);
 
-    @Query("select e from Position e ORDER BY e.dateCreated ASC  ")
+    @Query("select e from Position e ORDER BY e.dateCreated desc  ")
     List<Position> getAll();
 }

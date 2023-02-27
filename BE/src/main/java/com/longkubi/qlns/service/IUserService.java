@@ -26,6 +26,7 @@ public interface IUserService {
     Optional<User> findByUserName(String userName);
 
     User save(User user);
+    ResponseData<Boolean> changPassword(UserDto dto);
 
     boolean existsByUserName(String userName);
 

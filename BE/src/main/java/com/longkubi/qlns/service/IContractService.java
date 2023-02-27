@@ -21,4 +21,6 @@ public interface IContractService {
     ResponseData<Boolean> deleteById(UUID id);
     ContractDto getContractById(UUID id);
 
+    ResponseData<ContractDto> getContractByEmployeeId(UUID id);
+
 }

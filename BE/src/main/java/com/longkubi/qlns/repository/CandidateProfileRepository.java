@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 public interface CandidateProfileRepository extends JpaRepository<CandidateProfile, UUID> {
     Boolean existsCandidateProfileById(UUID id);
@@ -16,8 +17,13 @@ public interface CandidateProfileRepository extends JpaRepository<CandidateProfi
 
     @Query("select count (e) from CandidateProfile e where e.code = :code and e.id<>:id")
     Integer exclusionCode(@Param("code") String code, UUID id);
-    @Query("select e from CandidateProfile e ORDER BY e.dateCreated ASC  ")
+
+    //    @Query("select e from CandidateProfile e ORDER BY e.dateCreated DESC  ")
+//    List<CandidateProfile> getAll();
+    @Query("SELECT c FROM CandidateProfile c LEFT JOIN FETCH c.recruit  ORDER BY c.dateCreated DESC ")
     List<CandidateProfile> getAll();
+    //Stream<CandidateProfile> getAll();
+
 
     CandidateProfile getCandidateProfileById(UUID id);
 //    @Query("select c from CandidateProfile c join Recruit r on c.recruit = :recruit having r.quantity - count(c.id) > 0")

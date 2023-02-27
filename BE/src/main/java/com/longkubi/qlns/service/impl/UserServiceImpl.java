@@ -69,7 +69,11 @@ public class UserServiceImpl implements IUserService {
             entity.setFullName(userDto.getFullName());
             entity.setEmail(userDto.getEmail());
             entity.setRoles(userDto.getRoles().stream().map(roleDto -> modelMapper.map(roleDto, Role.class)).collect(Collectors.toSet()));
-
+            entity.setAvatar(userDto.getAvatar());
+            entity.setAddress(userDto.getAddress());
+            entity.setSex(userDto.getSex());
+            entity.setDateOfBirth(userDto.getDateOfBirth());
+            entity.setPhone(userDto.getPhone());
             return new ResponseData<>(SUCCESS, modelMapper.map(userRepository.save(entity), UserDto.class));
         }
         return new ResponseData<>(UPDATE_FAILED, null);
@@ -102,6 +106,18 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    public ResponseData<Boolean> changPassword(UserDto dto) {
+        if (!userService.existsByUserName(dto.getUserName()))
+            return new ResponseData<>(ACCOUNT_NAME_NOT_EXISTS, false);
+        Optional<UserDto> userDto = userService.loadUserByUsername(dto.getUserName());
+        if (!passwordEncoder.matches(dto.getPassWord(), userDto.get().getPassWord()))
+            return new ResponseData<>(OLD_PASSWORD_INCORRECT, false);
+        User user = userRepository.getUserById(dto.getId());
+        user.setPassWord(passwordEncoder.encode(dto.getNewPassword()));
+        return new ResponseData<>(SUCCESS, true);
+    }
+
+    @Override
     public boolean existsByUserName(String userName) {
         return userRepository.existsByUserName(userName);
     }
@@ -111,6 +127,7 @@ public class UserServiceImpl implements IUserService {
         return userRepository.existsByEmail(email);
     }
 
+    @Transactional
     @Override
     public Optional<UserDto> loadUserByUsername(String userName) throws UsernameNotFoundException {
         return Optional.ofNullable(userRepository.findByUserName(userName).map(user -> new ModelMapper().map(user, UserDto.class))

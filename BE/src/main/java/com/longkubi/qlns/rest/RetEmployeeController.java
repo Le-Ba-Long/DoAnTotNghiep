@@ -1,6 +1,7 @@
 package com.longkubi.qlns.rest;
 
 import com.longkubi.qlns.model.dto.EmployeeDto;
+import com.longkubi.qlns.model.dto.PersonnelChangeReport;
 import com.longkubi.qlns.model.dto.ResponseData;
 import com.longkubi.qlns.model.dto.search.EmployeeSearchDto;
 import com.longkubi.qlns.service.IEmployeeService;
@@ -10,7 +11,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.YearMonth;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -32,6 +35,24 @@ public class RetEmployeeController {
     @GetMapping("/employees-without-contract")
     public ResponseData<List<EmployeeDto>> getEmployeesWithoutContract() {
         return sv.getEmployeesWithoutContract();
+    }
+
+    @GetMapping("/get-personnel-change-report")
+    //public ResponseData<Map<YearMonth, Integer>> getPersonnelChangeReport() {
+    public ResponseData<List<PersonnelChangeReport>> getPersonnelChangeReport() {
+        return sv.getPersonnelChangeReport();
+    }
+
+    @GetMapping("/get-monthly-employee-count-report")
+    //public ResponseData<Map<YearMonth, Integer>> getPersonnelChangeReport() {
+    public ResponseData<List<PersonnelChangeReport>> getMonthlyEmployeeCountReport() {
+        return sv.getMonthlyEmployeeCountReport();
+    }
+
+    @GetMapping("/get-employee-allocation-ratio-by-department")
+    //public ResponseData<Map<YearMonth, Integer>> getPersonnelChangeReport() {
+    public ResponseData<List<PersonnelChangeReport>> getEmployeeAllocationRatioByDepartment() {
+        return sv.getEmployeeCountByDepartment();
     }
 
     @PostMapping("searchByDto")
