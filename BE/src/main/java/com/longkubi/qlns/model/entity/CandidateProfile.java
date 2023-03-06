@@ -78,7 +78,8 @@ public class CandidateProfile implements Serializable {
     private String skill;// các kĩ năng biết
     @Column(name = "career_goals")
     private String careerGoals;// mục tiêu nghề nghiệp
-
+    @Column(name = "title_recruit")
+    private String titleRecruit;// ví trí làm việc
     //@ManyToOne(fetch = FetchType.LAZY,cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
     // @JoinColumn(name = "recruit_code")
     //   @ManyToMany(mappedBy = "candidateProfiles",cascade = CascadeType.ALL)

@@ -149,7 +149,7 @@ export default function CandidateProfileView(props) {
                     Ứng tuyển vị trí:
                   </Grid>
                   <Grid item xs={8} md={8}>
-                    {item?.recruitDtos[0]?.titleRecruit || ''}
+                    {item?.titleRecruit || ''}
                   </Grid>
                 </Grid>
                 {candidate?.status === 18 ? (

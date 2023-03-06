@@ -90,6 +90,7 @@ export default function PromoteDialog(props) {
       department: item?.id ? item?.department : null,
       positions: item?.id ? item?.positions : null,
       status: item?.id ? item?.status : null,
+      refusalReason: '',
     },
     enableReinitialize: true,
     validateOnChange: false,
@@ -97,6 +98,7 @@ export default function PromoteDialog(props) {
     validationSchema: Yup.object({
       department: Yup.object().nullable().required('Vui lòng chọn trường này'),
       positions: Yup.array().nullable().required('Vui lòng chọn trường này'),
+      refusalReason: Yup.string().nullable().required('Vui lòng chọn trường này'),
     }),
     onSubmit: (values) => {
       values.id = item?.id;
@@ -160,6 +162,20 @@ export default function PromoteDialog(props) {
                 helperText={formik.errors.positions}
               />
             )}
+          />
+        </Grid>
+        <Grid item xs={12} md={12}>
+          <TextField
+            label="Lý do"
+            variant="outlined"
+            fullWidth
+            multiline
+            rows={2}
+            name="refusalReason"
+            value={formik.values?.refusalReason}
+            onChange={formik.handleChange}
+            error={formik.errors.refusalReason && formik.touched.refusalReason}
+            helperText={formik.errors.refusalReason}
           />
         </Grid>
         {item?.status === 12 && (

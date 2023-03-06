@@ -14,6 +14,7 @@ import UpdateSalary from './UpdateSalary';
 import InformationDialog from './InformationDialog';
 import PromoteDialog from './PromoteDialog';
 import QuitJobDialog from './QuitJobDialog';
+import HistoryDialog from './HistoryDialog';
 
 export default function UpdateHappeningDialog(props) {
   const { open, handleClose, item } = props;
@@ -22,10 +23,11 @@ export default function UpdateHappeningDialog(props) {
   const [shouldOpenPromoteDialog, setOpenPromoteDialog] = useState(false);
   const [shouldOpenSalaryeDialog, setOpenSalaryDialog] = useState(false);
   const [shouldOpenQuitJobDialog, setOpenQuitJobDialog] = useState(false);
+  const [shouldOpenHistoryDialog, setOpenHistoryDialog] = useState(false);
 
   return (
     <>
-      <Dialog open={open} fullWidth maxWidth={'md'}>
+      <Dialog open={open} fullWidth maxWidth={'lg'}>
         <DialogTitle style={{ marginBlockEnd: 0, padding: '16px 24px 0' }}>
           <Box className="icon-close" onClick={handleClose}>
             <IconButton color="error">
@@ -55,6 +57,12 @@ export default function UpdateHappeningDialog(props) {
           </p>
           <Collapse in={shouldOpenSalaryeDialog} timeout="auto" unmountOnExit>
             <UpdateSalary item={item} />
+          </Collapse>
+          <p onClick={() => setOpenHistoryDialog(!shouldOpenHistoryDialog)} className="collapse">
+            LỊCH SỬ CÔNG TÁC {shouldOpenHistoryDialog ? <ExpandLess /> : <ExpandMore />}
+          </p>
+          <Collapse in={shouldOpenHistoryDialog} timeout="auto" unmountOnExit>
+            <HistoryDialog item={item} />
           </Collapse>
         </DialogContent>
         <DialogActions>

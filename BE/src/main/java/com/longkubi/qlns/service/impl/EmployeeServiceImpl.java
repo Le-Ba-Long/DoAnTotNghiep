@@ -2,7 +2,10 @@ package com.longkubi.qlns.service.impl;
 
 import com.longkubi.qlns.common.Constant;
 import com.longkubi.qlns.common.ErrorMessage;
-import com.longkubi.qlns.model.dto.*;
+import com.longkubi.qlns.model.dto.EmployeeDto;
+import com.longkubi.qlns.model.dto.PersonnelChangeReport;
+import com.longkubi.qlns.model.dto.PositionDto;
+import com.longkubi.qlns.model.dto.ResponseData;
 import com.longkubi.qlns.model.dto.search.EmployeeSearchDto;
 import com.longkubi.qlns.model.entity.*;
 import com.longkubi.qlns.repository.CandidateProfileRepository;
@@ -13,6 +16,7 @@ import com.longkubi.qlns.service.IContractService;
 import com.longkubi.qlns.service.IDepartmentService;
 import com.longkubi.qlns.service.IEmployeeService;
 import com.longkubi.qlns.service.IPositionService;
+import org.apache.commons.lang.time.DateUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -26,13 +30,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.time.Month;
 import java.time.YearMonth;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.longkubi.qlns.common.Constant.StatusType.*;
-import static com.longkubi.qlns.common.Constant.StatusType.PASS;
 import static com.longkubi.qlns.common.ErrorMessage.*;
 
 @Transactional
@@ -66,6 +68,23 @@ public class EmployeeServiceImpl implements IEmployeeService {
     public ResponseData<EmployeeDto> create(EmployeeDto employeeDto, String token) {
         ErrorMessage errorMessage = validateEmployee(employeeDto, null, Constant.Insert);
         if (!errorMessage.equals(SUCCESS)) return new ResponseData<>(errorMessage, null);
+        if (employeeDto.getStatus() == TRY_JOB.getType()) {
+            EmployeeHistory employeeHistory = new EmployeeHistory();
+            employeeHistory.setDate(employeeDto.getDateChange());
+            String titleRecruit = employeeDto.getCandidateProfileDto().getRecruitDtos().get(0).getTitleRecruit();
+            String workingPosition = null;
+            for (PositionDto positionDto : employeeDto.getPositions()) {
+                workingPosition = positionDto.getName();
+            }
+            if (StringUtils.hasText(titleRecruit)) {
+                employeeHistory.setTitleRecruit(titleRecruit);
+                employeeHistory.setWorkingPosition(workingPosition);
+                employeeHistory.setEvent("Nhân Viên Thử Việc");
+            }
+            employeeHistory.setStatus(TRY_JOB.getType());
+            employeeHistory.setWorkingDepartment(employeeDto.getDepartment().getName());
+            employeeHistory.setEmployeeHistory(modelMapper.map(employeeDto, Employee.class));
+        }
         Employee entity = new Employee();
         modelMapper.map(employeeDto, entity);
         CandidateProfile candidateProfile = candidateProfileRepository.getCandidateProfileById(employeeDto.getCandidateProfileDto().getId());
@@ -82,6 +101,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
     public ResponseData<EmployeeDto> update(EmployeeDto employeeDto, UUID id, String token) {
         ErrorMessage errorMessage = validateEmployee(employeeDto, id, Constant.Update);
         if (!errorMessage.equals(SUCCESS)) return new ResponseData<>(errorMessage, null);
+        saveEmployeeHistory(employeeDto, id);
         Employee entity = repo.getEmployeeById(id);
         entity.setCode(employeeDto.getCode());
         entity.setFullName(employeeDto.getFullName());
@@ -147,7 +167,8 @@ public class EmployeeServiceImpl implements IEmployeeService {
         // List<Employee> employeeDtos = repo.findAll();
         List<Employee> employeeDtos = repo.getAll();
         if (employeeDtos.isEmpty()) return new ResponseData<>(SUCCESS, new ArrayList<>());
-        return new ResponseData<>(employeeDtos.stream().map(dto -> modelMapper.map(dto, EmployeeDto.class)).collect(Collectors.toList()));
+        //  return new ResponseData<>(employeeDtos.stream().map(dto -> modelMapper.map(dto, EmployeeDto.class)).collect(Collectors.toList()));
+        return new ResponseData<>(employeeDtos.stream().map(EmployeeDto::convertFromEntityToDto).collect(Collectors.toList()));
     }
 
     @Override//lấy ra tất cả nhân viên không có hợp đồng
@@ -222,6 +243,11 @@ public class EmployeeServiceImpl implements IEmployeeService {
         return new ResponseData<>(finalResult);
     }
 
+    @Override
+    public ResponseData<List<EmployeeDto>> getEmployeeBirthdayInRange(int startMonth, int endMonth) {
+        return new ResponseData<>(repo.getEmployeeBirthdayInRange(startMonth, endMonth).stream().map(employee -> modelMapper.map(employee, EmployeeDto.class)).collect(Collectors.toList()));
+    }
+
     private void convertListToMap(Map<YearMonth, Integer> personnelRecruitmentReport, List<Object[]> resultQuery) {
         for (Object[] result : resultQuery) {
             Integer month = (Integer) result[0];
@@ -230,6 +256,44 @@ public class EmployeeServiceImpl implements IEmployeeService {
             YearMonth yearMonth = YearMonth.of(year, month);
             personnelRecruitmentReport.put(yearMonth, count);
         }
+    }
+
+    //lấy ra danh sách nhân viên sắp hết hạn hợp đồng,đến hạn, quá hạn hợp đồng
+    @Override
+    public ResponseData<List<EmployeeDto>> getEmployeesAboutToExpireContract(Set<Integer> condition) {
+        if (condition.stream().allMatch(x -> x == 1 || x == 2 || x == 3) && condition.size() <= 3) {
+            StringBuilder sql = new StringBuilder("select e from Employee e join Contract c on e.contract.id = c.id  WHERE (1=1) AND (");
+            StringBuilder where = new StringBuilder("");
+            ;
+            Date dateNow = new Date();
+            Query querySql = null;
+            // lấy ra danh sách nhân viên 1: sắp hết hạn hợp đồng( lớn hơn thời điểm hiện tại và bé hơn tdht + 30 ngày nữa )
+            //  2:đến hạn(ngày hiện tại), 3: quá hạn hợp đồng(bé hơn ngày hiện tại)
+            if (condition.containsAll(Arrays.asList(1, 2, 3))) {
+                where.append(" c.contractEffect >= :dateNow AND c.contractEffect <= :dateNowAdd30Day OR c.contractEffect = :dateNow OR c.contractEffect < :dateNow ");
+            } else if (condition.containsAll(Arrays.asList(1, 2))) {
+                where.append(" c.contractEffect >= :dateNow AND c.contractEffect <= :dateNowAdd30Day OR c.contractEffect = :dateNow ");
+            } else if (condition.containsAll(Arrays.asList(1, 3))) {
+                where.append(" c.contractEffect >= :dateNow AND c.contractEffect <= :dateNowAdd30Day OR c.contractEffect < :dateNow ");
+            } else if (condition.containsAll(Arrays.asList(2, 3))) {
+                where.append(" c.contractEffect = :dateNow OR c.contractEffect < :dateNow");
+            } else if (condition.contains(1)) {
+                where.append(" c.contractEffect >= :dateNow AND c.contractEffect <= :dateNowAdd30Day");
+            } else if (condition.contains(2)) {
+                where.append(" c.contractEffect = :dateNow");
+            } else if (condition.contains(3)) {
+                where.append(" c.contractEffect < :dateNow");
+            }
+
+            querySql = manager.createQuery(sql.append(where).append(")").toString());
+            if (condition.contains(1)) {
+                querySql.setParameter("dateNowAdd30Day", DateUtils.addDays(dateNow, 30));
+            }
+            querySql.setParameter("dateNow", dateNow);
+            List<Employee> employeeDtos = querySql.getResultList();
+            return new ResponseData<>(employeeDtos.stream().map(employee -> modelMapper.map(employee, EmployeeDto.class)).collect(Collectors.toList()));
+        }
+        return new ResponseData<>(STATUS_NOT_SUPPORT, new ArrayList<>());
     }
 
     /**
@@ -533,4 +597,100 @@ public class EmployeeServiceImpl implements IEmployeeService {
         }
         return SUCCESS;
     }
+
+    ///lưu lại lịch sử quá trình công tác của nhân viên
+    private void saveEmployeeHistory(EmployeeDto employeeDto, UUID id) {
+        EmployeeHistory employeeHistory = new EmployeeHistory();
+        String titleRecruit = null;
+        Employee employee = null;
+        if (employeeDto.getId() != null) {
+            employee = repo.getEmployeeById(id);
+        }
+        assert employee != null;
+        for (Recruit recruit : employee.getCandidateProfile().getRecruit()) {
+            titleRecruit = recruit.getTitleRecruit();
+        }
+        String nameDepartment = employeeDto.getDepartment().getName();
+        String workingPosition = null;
+        for (PositionDto position : employeeDto.getPositions()) {
+            workingPosition = position.getName();
+        }
+        String nameDepartmentOld = null;
+        String workingPositionOld = null;
+        if (employeeDto.getId() != null) {
+            nameDepartmentOld = employee.getDepartment().getName();
+            for (Position position : employee.getPositions()) {
+                workingPositionOld = position.getName();
+            }
+        }
+        if (employeeDto.getStatus() == TRY_JOB.getType()) {
+            employeeHistory.setDate(new Date());
+            if (StringUtils.hasText(titleRecruit)) {
+                employeeHistory.setTitleRecruit(titleRecruit);
+                employeeHistory.setWorkingPosition(workingPosition);
+                employeeHistory.setEvent("Nhân Viên Thử Việc");
+            }
+            employeeHistory.setStatus(TRY_JOB.getType());
+            employeeHistory.setReason(employeeDto.getRefusalReason());
+            employeeHistory.setWorkingDepartment(nameDepartment);
+            employeeHistory.setEmployeeHistory(modelMapper.map(employeeDto, Employee.class));
+        } else if (employeeDto.getStatus() == OFFICIAL_STAFF.getType() && !nameDepartment.equals(nameDepartmentOld)) {
+            employeeHistory.setDate(new Date());
+            if (StringUtils.hasText(titleRecruit)) {
+                employeeHistory.setEvent(" Điều Chuyển Công Tác");
+                employeeHistory.setTitleRecruit(titleRecruit);
+            }
+            employeeHistory.setWorkingPosition(nameDepartment);
+            employeeHistory.setWorkingDepartment(nameDepartment);
+            employeeHistory.setReason(employeeDto.getRefusalReason());
+            employeeHistory.setStatus(OFFICIAL_STAFF.getType());
+            employeeHistory.setEmployeeHistory(modelMapper.map(employeeDto, Employee.class));
+        } else if (employeeDto.getStatus() == OFFICIAL_STAFF.getType() && !workingPosition.equals(workingPositionOld)) {
+            employeeHistory.setDate(new Date());
+            if (StringUtils.hasText(titleRecruit)) {
+                employeeHistory.setEvent("Thăng Chức");
+                employeeHistory.setTitleRecruit(titleRecruit);
+                employeeHistory.setWorkingPosition(workingPosition);
+            }
+            employeeHistory.setReason(employeeDto.getRefusalReason());
+            employeeHistory.setWorkingDepartment(nameDepartment);
+            employeeHistory.setStatus(OFFICIAL_STAFF.getType());
+            employeeHistory.setEmployeeHistory(modelMapper.map(employeeDto, Employee.class));
+        } else if (employeeDto.getStatus() == OFFICIAL_STAFF.getType()) {
+            employeeHistory.setDate(new Date());
+            if (StringUtils.hasText(titleRecruit)) {
+                employeeHistory.setTitleRecruit(titleRecruit);
+                employeeHistory.setWorkingPosition(workingPosition);
+                employeeHistory.setEvent("Nhân Viên  Chính Thức");
+            }
+            employeeHistory.setWorkingDepartment(nameDepartment);
+            employeeHistory.setReason(employeeDto.getRefusalReason());
+            employeeHistory.setStatus(OFFICIAL_STAFF.getType());
+            employeeHistory.setEmployeeHistory(modelMapper.map(employeeDto, Employee.class));
+        } else if (employeeDto.getStatus() == RETIRED_FROM_WORK.getType()) {
+            employeeHistory.setDate(new Date());
+            if (StringUtils.hasText(titleRecruit)) {
+                employeeHistory.setTitleRecruit(titleRecruit);
+                employeeHistory.setWorkingPosition(workingPosition);
+                employeeHistory.setEvent("Đã Nghỉ Việc");
+            }
+            employeeHistory.setWorkingDepartment(nameDepartment);
+            employeeHistory.setReason(employeeDto.getRefusalReason());
+            employeeHistory.setStatus(RETIRED_FROM_WORK.getType());
+            employeeHistory.setEmployeeHistory(modelMapper.map(employeeDto, Employee.class));
+        } else if (!nameDepartment.equals(nameDepartmentOld) && !workingPosition.equals(workingPositionOld)) {
+            employeeHistory.setDate(new Date());
+            if (StringUtils.hasText(titleRecruit)) {
+                employeeHistory.setTitleRecruit(titleRecruit);
+                employeeHistory.setEvent("Điều Chuyển Công Tác Và Thăng Chức");
+            }
+            employeeHistory.setWorkingPosition(workingPosition);
+            employeeHistory.setWorkingDepartment(nameDepartment);
+            employeeHistory.setReason(employeeDto.getRefusalReason());
+            employeeHistory.setStatus(OFFICIAL_STAFF.getType());
+            employeeHistory.setEmployeeHistory(modelMapper.map(employeeDto, Employee.class));
+        }
+        employeeHistoryRepository.save(employeeHistory);
+    }
+
 }

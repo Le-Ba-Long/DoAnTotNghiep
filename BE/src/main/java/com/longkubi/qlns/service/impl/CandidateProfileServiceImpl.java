@@ -23,9 +23,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
@@ -34,6 +40,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.longkubi.qlns.common.Constant.CANDIDATE_PROFILE_KEY;
 import static com.longkubi.qlns.common.Constant.StatusType.*;
 import static com.longkubi.qlns.common.ErrorMessage.*;
 import static com.longkubi.qlns.model.dto.CandidateProfileDto.convertFromEntityToDto;
@@ -56,18 +63,33 @@ public class CandidateProfileServiceImpl implements ICandidateProfileService {
 
     @Autowired
     private IEmailService iEmailService;
-    @Autowired
-    private EmployeeHistoryRepository employeeHistoryRepository;
+
 
     @Autowired
     private EntityManager manager;
+
+    @Autowired
+    private RedisConnectionFactory redisConnectionFactory;
+
+    private RedisTemplate<String, Object> redisTemplate;
+
+
+    @PostConstruct
+    public void init() {
+        redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
+        redisTemplate.afterPropertiesSet();
+    }
+
 
     @Override
     public ResponseData<CandidateProfileDto> create(CandidateProfileDto candidateProfileDto, String token) {
         ErrorMessage errorMessage = validateCandidateProfile(candidateProfileDto, null, Constant.Insert);
         if (!errorMessage.equals(SUCCESS)) return new ResponseData<>(errorMessage, null);
         CandidateProfile entity = new CandidateProfile();
-//        MultipartFile multipartFile = candidateProfileDto.getImage();
+        //    MultipartFile multipartFile = candidateProfileDto.getImage();
 //        String fileName = multipartFile.getOriginalFilename();
 //        try {
 //            FileCopyUtils.copy(candidateProfileDto.getImage().getBytes(), new File(this.fileUpload + fileName));
@@ -77,6 +99,7 @@ public class CandidateProfileServiceImpl implements ICandidateProfileService {
 //        }
 
         modelMapper.map(candidateProfileDto, entity);
+        entity.setTitleRecruit(candidateProfileDto.getRecruitDtos().get(0).getTitleRecruit());
         // insertEmployeeHistory(candidateProfileDto);
         // entity.setImage(fileName);
         entity.setRecruit(recruitService.getAllRecruit(candidateProfileDto.getRecruitDtos().stream().map(recruitDto -> recruitDto.getId()).collect(Collectors.toList())));
@@ -91,32 +114,6 @@ public class CandidateProfileServiceImpl implements ICandidateProfileService {
         return new ResponseData<>(convertFromEntityToDto(repo.save(entity)));
     }
 
-    private void insertEmployeeHistory(CandidateProfileDto candidateProfileDto) {
-        EmployeeHistory employeeHistory = new EmployeeHistory();
-        if (candidateProfileDto.getStatus() == PENDING_TREATMENT.getType()) {
-            employeeHistory.setDate(new Date());
-            if (StringUtils.hasText(candidateProfileDto.getRecruitDtos().get(0).getTitleRecruit())) {
-                employeeHistory.setEvent("Ứng Tuyển Vị Trí: " + candidateProfileDto.getRecruitDtos().get(0).getTitleRecruit());
-            }
-            employeeHistory.setStatus(PENDING_TREATMENT.getType());
-        } else if (candidateProfileDto.getStatus() == WAITING_FOR_INTERVIEW.getType()) {
-            employeeHistory.setDate(candidateProfileDto.getInterviewDate());
-            employeeHistory.setEvent("Hẹn Phỏng Vấn Vị Trí: " + candidateProfileDto.getRecruitDtos().get(0).getTitleRecruit());
-            employeeHistory.setStatus(PASS.getType());
-        } else if (candidateProfileDto.getStatus() == PASS.getType()) {
-            employeeHistory.setDate(candidateProfileDto.getInterviewDate());
-            employeeHistory.setEvent("Đã Pass Phỏng Vấn Vị Trí: " + candidateProfileDto.getRecruitDtos().get(0).getTitleRecruit());
-            employeeHistory.setStatus(PASS.getType());
-        } else if (candidateProfileDto.getStatus() == CANDIDATE_PROFILE_CONVERSION.getType()) {
-            employeeHistory.setDate(new Date());
-            employeeHistory.setEvent("Chuyển Đổi Sang Hồ Sơ Nhân Viên Thử Việc Vị Trí: " + candidateProfileDto.getRecruitDtos().get(0).getTitleRecruit());
-            employeeHistory.setStatus(CANDIDATE_PROFILE_CONVERSION.getType());//chuyển hồ sơ ứng viên khi đậu phỏng vấn sang hồ sơ nhân viên
-        }
-        employeeHistory.setEmployeeHistory(employeeRepository.getEmployeeById(UUID.fromString("303cb4cc-0c77-4b92-a030-4d9739fb8eae")));
-        employeeHistoryRepository.save(employeeHistory);
-    }
-
-
     @Override
     public ResponseData<CandidateProfileDto> update(CandidateProfileDto candidateProfileDto, UUID id, String token) {
         ErrorMessage errorMessage = validateCandidateProfile(candidateProfileDto, id, Constant.Update);
@@ -124,6 +121,7 @@ public class CandidateProfileServiceImpl implements ICandidateProfileService {
         long startTime = System.currentTimeMillis();
         log.info(String.valueOf(startTime));
         CandidateProfile entity = repo.getCandidateProfileById(id);
+        entity.setTitleRecruit(candidateProfileDto.getRecruitDtos().get(0).getTitleRecruit());
         entity.setCode(candidateProfileDto.getCode());
         entity.setFullName(candidateProfileDto.getFullName());
         entity.setDateOfBirth(candidateProfileDto.getDateOfBirth());
@@ -218,13 +216,35 @@ public class CandidateProfileServiceImpl implements ICandidateProfileService {
         return new ResponseData<>(convertFromEntityToDto(dto));
     }
 
-        @Override
+    @Override
     public ResponseData<List<CandidateProfileDto>> getAll() {
         // List<CandidateProfile> candidateProfiles = repo.findAll();
         List<CandidateProfile> candidateProfiles = repo.getAll();
         if (candidateProfiles.isEmpty()) return new ResponseData<>(SUCCESS, new ArrayList<>());
-        return new ResponseData<>(SUCCESS, candidateProfiles.stream().map(CandidateProfileDto::convertFromEntityToDto).collect(Collectors.toList()));
+        return new ResponseData<>(SUCCESS, candidateProfiles.stream().map(entity -> modelMapper.map(entity, CandidateProfileDto.class)).collect(Collectors.toList()));
+        // return new ResponseData<>(SUCCESS, candidateProfiles.stream().map(CandidateProfileDto::convertFromEntityToDto).collect(Collectors.toList()));
     }
+//    @Override
+//    public ResponseData<List<CandidateProfileDto>> getAll() {
+//        List<CandidateProfileDto> candidateProfileDtoList;
+//        ValueOperations<String, Object> operations = redisTemplate.opsForValue();
+//        if (redisTemplate.hasKey(CANDIDATE_PROFILE_KEY)) {
+//            candidateProfileDtoList = (List<CandidateProfileDto>) operations.get(CANDIDATE_PROFILE_KEY);
+//        } else {
+//            List<CandidateProfile> candidateProfiles = repo.getAll();
+//            candidateProfileDtoList = candidateProfiles.stream().map(dto -> modelMapper.map(dto, CandidateProfileDto.class)).collect(Collectors.toList());
+//            operations.set(CANDIDATE_PROFILE_KEY, candidateProfileDtoList);
+//        }
+//        if (candidateProfileDtoList.isEmpty()) return new ResponseData<>(SUCCESS, new ArrayList<>());
+//        return new ResponseData<>(candidateProfileDtoList);
+//    }
+//
+//
+//    public void updateCandidateProfile(CandidateProfileDto candidateProfileDto) {
+//        repo.save(modelMapper.map(candidateProfileDto, CandidateProfile.class));
+//        redisTemplate.delete(CANDIDATE_PROFILE_KEY); // Xóa khóa Redis chứa dữ liệu
+//    }
+
 //    public ResponseData<List<CandidateProfileDto>> getAll() {
 //        Stream<CandidateProfile> candidateProfileStream = repo.getAll();
 //        List<CandidateProfileDto> candidateProfileDtos = candidateProfileStream

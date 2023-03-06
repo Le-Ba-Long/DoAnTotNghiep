@@ -1,14 +1,11 @@
 package com.longkubi.qlns.repository;
 
-import com.longkubi.qlns.model.dto.PersonnelChangeReport;
 import com.longkubi.qlns.model.entity.Employee;
-import io.swagger.models.auth.In;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
@@ -24,6 +21,9 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
 
     @Query("select e from Employee e ORDER BY e.dateCreated DESC  ")
     List<Employee> getAll();
+
+    @Query("select e from Employee e where MONTH(e.dateOfBirth) between :startMonth and  :endMonth ORDER BY e.dateOfBirth ASC")
+    List<Employee> getEmployeeBirthdayInRange(@Param("startMonth") int startMonth, @Param("endMonth") int endMonth);//lấy ra danh sách nhân viên có sinh nhật trong tháng nhập vào
 
     @Query("select e from Employee e  where  e.contract is  null and e.status = 3  ORDER BY e.dateCreated ASC  ")
     List<Employee> getEmployeesWithoutContract();

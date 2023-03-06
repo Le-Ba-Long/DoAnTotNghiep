@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Constant {
+    public static final String CANDIDATE_PROFILE_KEY = "candidate_profile";
     public static final String REGEX_CODE_LANGUAGE = "^MaNN[0-9]{4}$";
     public static final String REGEX_CODE_DEPARTMENT = "^MaPB[0-9]{4}$";
 
@@ -31,6 +32,8 @@ public class Constant {
     public static final String Delete = "Delete";
 
     public static final String Update = "Update";
+    public static String titleBirthDay[] = {"STT","code", "fullName", "dateOfBirth", "sex", "position", "department.name"};
+    public static String titleContract[] = {"STT","code", "fullName","position", "department.name","contract.code","contract.contractEffect"};
 
     public enum StatusType {
         NOT_APPROVED((byte) -1),//Không duyệt

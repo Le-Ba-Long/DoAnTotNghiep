@@ -3,11 +3,16 @@ package com.longkubi.qlns.service.impl;
 import com.longkubi.qlns.common.Constant;
 import com.longkubi.qlns.common.ErrorMessage;
 import com.longkubi.qlns.model.dto.CommendationAndDisciplineDto;
+import com.longkubi.qlns.model.dto.EmployeeDto;
+import com.longkubi.qlns.model.dto.PositionDto;
 import com.longkubi.qlns.model.dto.ResponseData;
 import com.longkubi.qlns.model.dto.search.CommendationAndDisciplineSearchDto;
 import com.longkubi.qlns.model.entity.CommendationAndDiscipline;
 import com.longkubi.qlns.model.entity.Employee;
+import com.longkubi.qlns.model.entity.EmployeeHistory;
+import com.longkubi.qlns.model.entity.Recruit;
 import com.longkubi.qlns.repository.CommendationAndDisciplineRepository;
+import com.longkubi.qlns.repository.EmployeeHistoryRepository;
 import com.longkubi.qlns.repository.EmployeeRepository;
 import com.longkubi.qlns.security.jwt.JwtProvider;
 import com.longkubi.qlns.service.ICommendationAndDisciplineService;
@@ -24,6 +29,8 @@ import javax.persistence.Query;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.longkubi.qlns.common.Constant.StatusType.FINISHED;
+import static com.longkubi.qlns.common.Constant.StatusType.OFFICIAL_STAFF;
 import static com.longkubi.qlns.common.ErrorMessage.*;
 
 @Service
@@ -35,11 +42,12 @@ public class CommendationAndDisciplineServiceImpl implements ICommendationAndDis
     private ModelMapper modelMapper;
     @Autowired
     private JwtProvider jwtProvider;
-
     @Autowired
     private EmployeeRepository employeeRepository;
     @Autowired
     private EntityManager manager;
+    @Autowired
+    private EmployeeHistoryRepository employeeHistoryRepository;
 
     //    @Override
 //    public ResponseData<CommendationAndDisciplineDto> create(CommendationAndDisciplineDto commendationAndDisciplineDto, String token) {
@@ -74,24 +82,26 @@ public class CommendationAndDisciplineServiceImpl implements ICommendationAndDis
     public ResponseData<CommendationAndDisciplineDto> update(CommendationAndDisciplineDto commendationAndDisciplineDto, UUID id, String token) {
         ErrorMessage errorMessage = validateContract(commendationAndDisciplineDto, id, Constant.Update);
         if (!errorMessage.equals(SUCCESS)) return new ResponseData<>(errorMessage, null);
+        saveEmployeeHistory(commendationAndDisciplineDto);
         CommendationAndDiscipline entity = repo.getCommendationAndDisciplineById(id);
         //entity.setEmployee(contractDto.getEmployee());
         entity.setDay(commendationAndDisciplineDto.getDay());
         entity.setMonth(commendationAndDisciplineDto.getMonth());
         entity.setYear(commendationAndDisciplineDto.getYear());
         entity.setReason(commendationAndDisciplineDto.getReason());
-        if(!Objects.isNull(commendationAndDisciplineDto.getIssuedDate())){
-        entity.setIssuedDate(commendationAndDisciplineDto.getIssuedDate());}
+        if (!Objects.isNull(commendationAndDisciplineDto.getIssuedDate())) {
+            entity.setIssuedDate(commendationAndDisciplineDto.getIssuedDate());
+        }
         // entity.setDecisionDay(commendationAndDisciplineDto.getDecisionDay());
         entity.setType(commendationAndDisciplineDto.getType());
         entity.setDecisionNumber(commendationAndDisciplineDto.getDecisionNumber());
         if (!Objects.isNull(commendationAndDisciplineDto.getRewardDisciplineLevel())) {
             entity.setRewardDisciplineLevel(commendationAndDisciplineDto.getRewardDisciplineLevel());
         }
-        if(!Objects.isNull(commendationAndDisciplineDto.getBasicSalary())){
+        if (!Objects.isNull(commendationAndDisciplineDto.getBasicSalary())) {
             entity.setBasicSalary(commendationAndDisciplineDto.getBasicSalary());
         }
-        if(!Objects.isNull(commendationAndDisciplineDto.getCoefficientSalary())){
+        if (!Objects.isNull(commendationAndDisciplineDto.getCoefficientSalary())) {
             entity.setCoefficientSalary(commendationAndDisciplineDto.getCoefficientSalary());
         }
         if (!Objects.isNull(commendationAndDisciplineDto.getHourlyRate())) {
@@ -242,5 +252,61 @@ public class CommendationAndDisciplineServiceImpl implements ICommendationAndDis
             //  if (repo.exclusionName(certificateDto.getName(), id) > 0) return NAME_EXIST;
         }
         return SUCCESS;
+    }
+
+    private void saveEmployeeHistory(CommendationAndDisciplineDto commendationAndDisciplineDto) {
+        EmployeeHistory employeeHistory = new EmployeeHistory();
+        Employee employee = null;
+        String titleRecruit = null;
+        if (commendationAndDisciplineDto.getEmployeeDto().getId() != null) {
+            employee = employeeRepository.getEmployeeById(commendationAndDisciplineDto.getEmployeeDto().getId());
+        }
+        assert employee != null;
+        for (Recruit recruit : employee.getCandidateProfile().getRecruit()) {
+            titleRecruit = recruit.getTitleRecruit();
+        }
+        String nameDepartment = commendationAndDisciplineDto.getEmployeeDto().getDepartment().getName();
+        String workingPosition = null;
+        byte status = commendationAndDisciplineDto.getStatus();
+        byte type = commendationAndDisciplineDto.getType();
+        EmployeeDto employeeDto = commendationAndDisciplineDto.getEmployeeDto();
+        for (PositionDto position : employeeDto.getPositions()) {
+            workingPosition = position.getName();
+        }
+        if (status == FINISHED.getType() && type == 1) {
+            employeeHistory.setDate(commendationAndDisciplineDto.getDateChange() == null ? commendationAndDisciplineDto.getDateCreated() : commendationAndDisciplineDto.getDateChange());
+            if (StringUtils.hasText(titleRecruit)) {
+                employeeHistory.setTitleRecruit(titleRecruit);
+                employeeHistory.setWorkingPosition(workingPosition);
+                employeeHistory.setEvent("Nhân Viên Bị Kỉ Luật");
+            }
+            employeeHistory.setStatus(OFFICIAL_STAFF.getType());
+            employeeHistory.setReason(commendationAndDisciplineDto.getReason());
+            employeeHistory.setWorkingDepartment(nameDepartment);
+            employeeHistory.setEmployeeHistory(modelMapper.map(employeeDto, Employee.class));
+        } else if (status == FINISHED.getType() && type == 2) {
+            employeeHistory.setDate(commendationAndDisciplineDto.getDateChange() == null ? commendationAndDisciplineDto.getDateCreated() : commendationAndDisciplineDto.getDateChange());
+            if (StringUtils.hasText(titleRecruit)) {
+                employeeHistory.setTitleRecruit(titleRecruit);
+                employeeHistory.setWorkingPosition(workingPosition);
+                employeeHistory.setEvent("Nhân Viên Được Khen Thưởng");
+            }
+            employeeHistory.setWorkingDepartment(nameDepartment);
+            employeeHistory.setStatus(OFFICIAL_STAFF.getType());
+            employeeHistory.setReason(commendationAndDisciplineDto.getReason());
+            employeeHistory.setEmployeeHistory(modelMapper.map(employeeDto, Employee.class));
+        } else if (status == FINISHED.getType() && type == 3) {
+            employeeHistory.setDate(commendationAndDisciplineDto.getDateChange() == null ? commendationAndDisciplineDto.getDateCreated() : commendationAndDisciplineDto.getDateChange());
+            if (StringUtils.hasText(titleRecruit)) {
+                employeeHistory.setTitleRecruit(titleRecruit);
+                employeeHistory.setWorkingPosition(workingPosition);
+                employeeHistory.setEvent("Nhân Viên Được Tăng Lương");
+            }
+            employeeHistory.setReason(commendationAndDisciplineDto.getReason());
+            employeeHistory.setWorkingDepartment(nameDepartment);
+            employeeHistory.setStatus(OFFICIAL_STAFF.getType());
+            employeeHistory.setEmployeeHistory(modelMapper.map(employeeDto, Employee.class));
+        }
+        employeeHistoryRepository.save(employeeHistory);
     }
 }
