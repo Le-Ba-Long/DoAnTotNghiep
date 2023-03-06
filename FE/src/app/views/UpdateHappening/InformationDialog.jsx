@@ -1,28 +1,24 @@
-import React, { useState, useEffect } from "react";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import Grid from "@mui/material/Grid";
-import TextField from "@mui/material/TextField";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { MenuItem } from "@mui/material";
-import { sex } from "app/constant";
-import Autocomplete, { createFilterOptions } from "@mui/material/Autocomplete";
-import moment from "moment";
-import Checkbox from "@mui/material/Checkbox";
-import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
-import CheckBoxIcon from "@mui/icons-material/CheckBox";
-import Box from "@mui/material/Box";
-import { uploadImage } from "app/constant";
-import {
-  getListCertificate,
-  getListLanguage,
-  editEmployee,
-} from "./UpdateHappeningService";
-import { toast } from "react-toastify";
-import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add";
+import React, { useState, useEffect } from 'react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { MenuItem } from '@mui/material';
+import { sex } from 'app/constant';
+import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
+import moment from 'moment';
+import Checkbox from '@mui/material/Checkbox';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import Box from '@mui/material/Box';
+import { uploadImage } from 'app/constant';
+import { getListCertificate, getListLanguage, editEmployee } from './UpdateHappeningService';
+import { toast } from 'react-toastify';
+import Button from '@mui/material/Button';
+import AddIcon from '@mui/icons-material/Add';
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -43,54 +39,46 @@ export default function InformationDialog(props) {
         if (res.data.statusCode === 200) {
           setListCertificate(res.data.data);
         } else {
-          toast.warning("Lỗi xác thực");
+          toast.warning('Lỗi xác thực');
         }
       })
-      .catch((err) => toast.error("Có lỗi xảy ra"));
+      .catch((err) => toast.error('Có lỗi xảy ra'));
 
     getListLanguage()
       .then((res) => {
         if (res.data.statusCode === 200) {
           setListLanguage(res.data.data);
         } else {
-          toast.warning("Lỗi xác thực");
+          toast.warning('Lỗi xác thực');
         }
       })
-      .catch((err) => toast.error("Có lỗi xảy ra"));
+      .catch((err) => toast.error('Có lỗi xảy ra'));
   }, []);
 
   const formik = useFormik({
     initialValues: {
-      code: item?.id ? item?.code : "",
-      fullName: item?.id ? item?.fullName : "",
+      code: item?.id ? item?.code : '',
+      fullName: item?.id ? item?.fullName : '',
       dateOfBirth: item?.id ? item?.dateOfBirth : null,
-      sex: item?.id ? item?.sex : "",
-      image: item?.id ? item?.image : "",
-      imageName: item?.id ? item?.imageName : "",
-      phone: item?.id ? item?.phone : "",
-      email: item?.id ? item?.email : "",
-      education: item?.id ? item?.education : "",
-      major: item?.id ? item?.major : "",
-      nation: item?.id ? item?.nation : "",
-      religion: item?.id ? item?.religion : "",
-      address: item?.id ? item?.address : "",
-      numberIdentityCard: item?.id ? item?.numberIdentityCard : "",
+      sex: item?.id ? item?.sex : '',
+      image: item?.id ? item?.image : '',
+      imageName: item?.id ? item?.imageName : '',
+      phone: item?.id ? item?.phone : '',
+      email: item?.id ? item?.email : '',
+      education: item?.id ? item?.education : '',
+      major: item?.id ? item?.major : '',
+      nation: item?.id ? item?.nation : '',
+      religion: item?.id ? item?.religion : '',
+      address: item?.id ? item?.address : '',
+      numberIdentityCard: item?.id ? item?.numberIdentityCard : '',
       issuedDateIdentityCard: item?.id ? item?.issuedDateIdentityCard : null,
-      placeOfGrantIdentityCard: item?.id ? item?.placeOfGrantIdentityCard : "",
-      numberMedicalInsurance: item?.id ? item?.numberMedicalInsurance : "",
-      issuedDateMedicalInsurance: item?.id
-        ? item?.issuedDateMedicalInsurance
-        : null,
-      placeOfIssueMedicalInsurance: item?.id
-        ? item?.placeOfIssueMedicalInsurance
-        : "",
-      numberSocialInsurance: item?.id ? item?.numberSocialInsurance : "",
-      issuedDateSocialInsurance: item?.id
-        ? item?.issuedDateSocialInsurance
-        : null,
-      placeOfIssueSocialInsurance: item?.id
-        ? item?.placeOfIssueSocialInsurance
-        : "",
+      placeOfGrantIdentityCard: item?.id ? item?.placeOfGrantIdentityCard : '',
+      numberMedicalInsurance: item?.id ? item?.numberMedicalInsurance : '',
+      issuedDateMedicalInsurance: item?.id ? item?.issuedDateMedicalInsurance : null,
+      placeOfIssueMedicalInsurance: item?.id ? item?.placeOfIssueMedicalInsurance : '',
+      numberSocialInsurance: item?.id ? item?.numberSocialInsurance : '',
+      issuedDateSocialInsurance: item?.id ? item?.issuedDateSocialInsurance : null,
+      placeOfIssueSocialInsurance: item?.id ? item?.placeOfIssueSocialInsurance : '',
       certificate: item?.id ? item?.certificate : null,
       languages: item?.id ? item?.languages : [],
     },
@@ -99,60 +87,45 @@ export default function InformationDialog(props) {
     validateOnBlur: false,
     validationSchema: Yup.object({
       code: Yup.string()
-        .matches(/^MaNV[0-9]{4}$/, "Mã bằng cấp chưa đúng format VD:(MaNV9999)")
-        .required("Vui lòng nhập trường này"),
-      fullName: Yup.string().required("Vui lòng nhập trường này"),
+        .matches(/^MaNV[0-9]{4}$/, 'Mã bằng cấp chưa đúng format VD:(MaNV9999)')
+        .required('Vui lòng nhập trường này'),
+      fullName: Yup.string().required('Vui lòng nhập trường này'),
       dateOfBirth: Yup.date()
         .nullable()
-        .typeError("Sai định dạng ngày!")
-        .required("Vui lòng nhập trường này"),
-      sex: Yup.string().required("Vui lòng nhập trường này!"),
+        .typeError('Sai định dạng ngày!')
+        .required('Vui lòng nhập trường này'),
+      sex: Yup.string().required('Vui lòng nhập trường này!'),
       email: Yup.string()
-        .matches(
-          /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/,
-          "Đây không phải là email!"
-        )
-        .required("Vui lòng nhập Email!"),
+        .matches(/^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/, 'Đây không phải là email!')
+        .required('Vui lòng nhập Email!'),
       phone: Yup.string()
-        .matches(/(84|0[3|5|7|8|9])+([0-9]{8})\b/, "Số điện thoại không hợp lệ")
-        .required("Vui lòng nhập số điện thoại!"),
-      education: Yup.string().required("Vui lòng nhập trường này"),
-      major: Yup.string().required("Vui lòng nhập trường này"),
-      nation: Yup.string().required("Vui lòng nhập trường này"),
-      religion: Yup.string().required("Vui lòng nhập trường này"),
-      address: Yup.string().required("Vui lòng nhập trường này"),
-      numberIdentityCard: Yup.number()
-        .nullable()
-        .typeError("Số CCCD phải là số!"),
+        .matches(/(84|0[3|5|7|8|9])+([0-9]{8})\b/, 'Số điện thoại không hợp lệ')
+        .required('Vui lòng nhập số điện thoại!'),
+      education: Yup.string().required('Vui lòng nhập trường này'),
+      major: Yup.string().required('Vui lòng nhập trường này'),
+      nation: Yup.string().required('Vui lòng nhập trường này'),
+      religion: Yup.string().required('Vui lòng nhập trường này'),
+      address: Yup.string().required('Vui lòng nhập trường này'),
+      numberIdentityCard: Yup.number().nullable().typeError('Số CCCD phải là số!'),
       // .required('Vui lòng nhập trường này'),
-      issuedDateIdentityCard: Yup.date()
-        .nullable()
-        .typeError("Sai định dạng ngày!"),
+      issuedDateIdentityCard: Yup.date().nullable().typeError('Sai định dạng ngày!'),
       // .required('Vui lòng nhập trường này'),
       placeOfGrantIdentityCard: Yup.string().nullable(),
       // .required('Vui lòng nhập trường này'),
-      numberMedicalInsurance: Yup.number()
-        .nullable()
-        .typeError("Số bảo hiểm y tế phải là số!"),
+      numberMedicalInsurance: Yup.number().nullable().typeError('Số bảo hiểm y tế phải là số!'),
       // .required('Vui lòng nhập trường này'),
-      issuedDateMedicalInsurance: Yup.date()
-        .nullable()
-        .typeError("Sai định dạng ngày!"),
+      issuedDateMedicalInsurance: Yup.date().nullable().typeError('Sai định dạng ngày!'),
       // .required('Vui lòng nhập trường này'),
       placeOfIssueMedicalInsurance: Yup.string().nullable(),
       // .required('Vui lòng nhập trường này'),
-      numberSocialInsurance: Yup.number()
-        .nullable()
-        .typeError("Số bảo hiểm xã hội phải là số!"),
+      numberSocialInsurance: Yup.number().nullable().typeError('Số bảo hiểm xã hội phải là số!'),
       // .required('Vui lòng nhập trường này'),
-      issuedDateSocialInsurance: Yup.date()
-        .nullable()
-        .typeError("Sai định dạng ngày!"),
+      issuedDateSocialInsurance: Yup.date().nullable().typeError('Sai định dạng ngày!'),
       // .required('Vui lòng nhập trường này'),
       placeOfIssueSocialInsurance: Yup.string().nullable(),
       // .required('Vui lòng nhập trường này'),
-      certificate: Yup.object().nullable().required("Vui lòng chọn trường này"),
-      languages: Yup.array().nullable().required("Vui lòng chọn trường này"),
+      certificate: Yup.object().nullable().required('Vui lòng chọn trường này'),
+      languages: Yup.array().nullable().required('Vui lòng chọn trường này'),
     }),
     onSubmit: (values) => {
       values.id = item?.id;
@@ -167,12 +140,12 @@ export default function InformationDialog(props) {
     editEmployee(values)
       .then((res) => {
         if (res.data.statusCode === 200) {
-          toast.success("Sửa thông tin nhân viên thành công");
+          toast.success('Sửa thông tin nhân viên thành công');
         } else {
           toast.warning(res.data.message);
         }
       })
-      .catch((err) => toast.error("Có lỗi xảy ra!"));
+      .catch((err) => toast.error('Có lỗi xảy ra!'));
   };
 
   return (
@@ -218,7 +191,7 @@ export default function InformationDialog(props) {
                 value={formik.values?.dateOfBirth}
                 onChange={(value) => {
                   if (value) {
-                    formik.setFieldValue("dateOfBirth", new Date(value));
+                    formik.setFieldValue('dateOfBirth', new Date(value));
                   }
                 }}
                 renderInput={(params) => {
@@ -229,9 +202,7 @@ export default function InformationDialog(props) {
                       type="date"
                       fullWidth
                       variant="outlined"
-                      error={
-                        formik.errors.dateOfBirth && formik.touched.dateOfBirth
-                      }
+                      error={formik.errors.dateOfBirth && formik.touched.dateOfBirth}
                       helperText={formik.errors.dateOfBirth}
                     />
                   );
@@ -243,11 +214,11 @@ export default function InformationDialog(props) {
             <TextField
               label="Ảnh ứng viên"
               type="text"
-              style={{ width: "82%" }}
+              style={{ width: '82%' }}
               name="imageName"
               value={formik.values?.imageName}
               InputLabelProps={{ shrink: true }}
-              inputProps={{ accept: "image/*" }}
+              inputProps={{ accept: 'image/*' }}
             />
             <label for="file-upload" className="custom-file-upload">
               <AddIcon />
@@ -259,8 +230,8 @@ export default function InformationDialog(props) {
               onChange={(event) => {
                 console.log(event.currentTarget.files[0]);
                 uploadImage(event.currentTarget.files[0]).then((res) => {
-                  formik.setFieldValue("image", res?.data?.fileDownloadUri);
-                  formik.setFieldValue("imageName", res?.data?.fileName);
+                  formik.setFieldValue('image', res?.data?.fileDownloadUri);
+                  formik.setFieldValue('imageName', res?.data?.fileName);
                 });
               }}
             ></input>
@@ -340,10 +311,7 @@ export default function InformationDialog(props) {
               name="numberIdentityCard"
               value={formik.values?.numberIdentityCard}
               onChange={formik.handleChange}
-              error={
-                formik.errors.numberIdentityCard &&
-                formik.touched.numberIdentityCard
-              }
+              error={formik.errors.numberIdentityCard && formik.touched.numberIdentityCard}
               helperText={formik.errors.numberIdentityCard}
             />
           </Grid>
@@ -356,10 +324,7 @@ export default function InformationDialog(props) {
                 value={formik.values?.issuedDateIdentityCard || null}
                 onChange={(value) => {
                   if (value) {
-                    formik.setFieldValue(
-                      "issuedDateIdentityCard",
-                      new Date(value)
-                    );
+                    formik.setFieldValue('issuedDateIdentityCard', new Date(value));
                   }
                 }}
                 renderInput={(params) => {
@@ -392,8 +357,7 @@ export default function InformationDialog(props) {
               value={formik.values?.placeOfGrantIdentityCard}
               onChange={formik.handleChange}
               error={
-                formik.errors.placeOfGrantIdentityCard &&
-                formik.touched.placeOfGrantIdentityCard
+                formik.errors.placeOfGrantIdentityCard && formik.touched.placeOfGrantIdentityCard
               }
               helperText={formik.errors.placeOfGrantIdentityCard}
             />
@@ -448,10 +412,7 @@ export default function InformationDialog(props) {
               name="numberMedicalInsurance"
               value={formik.values?.numberMedicalInsurance}
               onChange={formik.handleChange}
-              error={
-                formik.errors.numberMedicalInsurance &&
-                formik.touched.numberMedicalInsurance
-              }
+              error={formik.errors.numberMedicalInsurance && formik.touched.numberMedicalInsurance}
               helperText={formik.errors.numberMedicalInsurance}
             />
           </Grid>
@@ -464,10 +425,7 @@ export default function InformationDialog(props) {
                 value={formik.values?.issuedDateMedicalInsurance || null}
                 onChange={(value) => {
                   if (value) {
-                    formik.setFieldValue(
-                      "issuedDateMedicalInsurance",
-                      new Date(value)
-                    );
+                    formik.setFieldValue('issuedDateMedicalInsurance', new Date(value));
                   }
                 }}
                 renderInput={(params) => {
@@ -514,10 +472,7 @@ export default function InformationDialog(props) {
               name="numberSocialInsurance"
               value={formik.values?.numberSocialInsurance}
               onChange={formik.handleChange}
-              error={
-                formik.errors.numberSocialInsurance &&
-                formik.touched.numberSocialInsurance
-              }
+              error={formik.errors.numberSocialInsurance && formik.touched.numberSocialInsurance}
               helperText={formik.errors.numberSocialInsurance}
             />
           </Grid>
@@ -530,10 +485,7 @@ export default function InformationDialog(props) {
                 value={formik.values?.issuedDateSocialInsurance || null}
                 onChange={(value) => {
                   if (value) {
-                    formik.setFieldValue(
-                      "issuedDateSocialInsurance",
-                      new Date(value)
-                    );
+                    formik.setFieldValue('issuedDateSocialInsurance', new Date(value));
                   }
                 }}
                 renderInput={(params) => {
@@ -578,9 +530,7 @@ export default function InformationDialog(props) {
             options={listCertificate}
             getOptionLabel={(option) => option.name}
             value={formik.values?.certificate}
-            onChange={(event, value) =>
-              formik.setFieldValue("certificate", value)
-            }
+            onChange={(event, value) => formik.setFieldValue('certificate', value)}
             filterOptions={filterOptions}
             renderOption={(props, option, { selected }) => (
               <Box component="li" {...props}>
@@ -590,13 +540,13 @@ export default function InformationDialog(props) {
                   style={{ marginRight: 8 }}
                   checked={selected}
                 />
-                <span style={{ width: "10%" }}>{option.code}</span>{" "}
-                <span style={{ width: "15%" }}>{option.name}</span>{" "}
-                <span style={{ width: "25%" }}>{option.majors}</span>{" "}
-                <span style={{ width: "10%" }}>
-                  {moment(option.issuedDate).format("DD/MM/YYYY")}
-                </span>{" "}
-                <span style={{ width: "25%" }}>{option.grantedBy}</span>
+                <span style={{ width: '10%' }}>{option.code}</span>{' '}
+                <span style={{ width: '15%' }}>{option.name}</span>{' '}
+                <span style={{ width: '25%' }}>{option.majors}</span>{' '}
+                <span style={{ width: '10%' }}>
+                  {moment(option.issuedDate).format('DD/MM/YYYY')}
+                </span>{' '}
+                <span style={{ width: '25%' }}>{option.grantedBy}</span>
               </Box>
             )}
             renderInput={(params) => (
@@ -620,7 +570,7 @@ export default function InformationDialog(props) {
             defaultValue={[]}
             onChange={(event, value) => {
               if (value) {
-                formik.setFieldValue("languages", value);
+                formik.setFieldValue('languages', value);
               }
             }}
             filterOptions={filterOptions}
@@ -632,9 +582,9 @@ export default function InformationDialog(props) {
                   style={{ marginRight: 8 }}
                   checked={selected}
                 />
-                <span style={{ width: "10%" }}>{option.code}</span>{" "}
-                <span style={{ width: "15%" }}>{option.name}</span>{" "}
-                <span style={{ width: "50%" }}>{option.description}</span>
+                <span style={{ width: '10%' }}>{option.code}</span>{' '}
+                <span style={{ width: '15%' }}>{option.name}</span>{' '}
+                <span style={{ width: '50%' }}>{option.description}</span>
               </Box>
             )}
             renderInput={(params) => (
@@ -649,12 +599,12 @@ export default function InformationDialog(props) {
           />
         </Grid>
       </Grid>
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
         <Button
           variant="contained"
           color="primary"
           onClick={() => formik.handleSubmit()}
-          style={{ margin: "10px" }}
+          style={{ margin: '10px' }}
         >
           Lưu
         </Button>

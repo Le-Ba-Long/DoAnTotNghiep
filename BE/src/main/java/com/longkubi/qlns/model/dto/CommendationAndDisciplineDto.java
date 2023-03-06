@@ -1,7 +1,6 @@
 package com.longkubi.qlns.model.dto;
 
 import com.longkubi.qlns.model.entity.CommendationAndDiscipline;
-import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -50,6 +49,14 @@ public class CommendationAndDisciplineDto {
 
     private Byte status;
 
+    private String creator;
+
+    private Date dateCreated;
+
+    private String changedBy;
+
+    private Date dateChange;
+
     private EmployeeDto employeeDto;
     private static ModelMapper modelMapper = new ModelMapper();
 
@@ -57,6 +64,7 @@ public class CommendationAndDisciplineDto {
         CommendationAndDisciplineDto dto = modelMapper.map(entity, CommendationAndDisciplineDto.class);
         if (!Objects.isNull(entity.getEmployee())) {
             dto.setEmployeeDto(modelMapper.map(entity.getEmployee(), EmployeeDto.class));
+        //    dto.setEmployeeDto(EmployeeDto.convertFromEntityToDto(entity.getEmployee()));
         }
 
         return dto;

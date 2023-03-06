@@ -1,14 +1,12 @@
 package com.longkubi.qlns.repository;
 
 import com.longkubi.qlns.model.entity.CandidateProfile;
-import com.longkubi.qlns.model.entity.Recruit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 public interface CandidateProfileRepository extends JpaRepository<CandidateProfile, UUID> {
     Boolean existsCandidateProfileById(UUID id);
@@ -20,7 +18,9 @@ public interface CandidateProfileRepository extends JpaRepository<CandidateProfi
 
     //    @Query("select e from CandidateProfile e ORDER BY e.dateCreated DESC  ")
 //    List<CandidateProfile> getAll();
-    @Query("SELECT c FROM CandidateProfile c LEFT JOIN FETCH c.recruit  ORDER BY c.dateCreated DESC ")
+//    @QueryHints(value = {@QueryHint(name = "javax.persistence.cache.storeMode", value = "USE")},
+//            forCounting = false)
+    @Query("SELECT c FROM CandidateProfile c ORDER BY c.dateCreated DESC ")
     List<CandidateProfile> getAll();
     //Stream<CandidateProfile> getAll();
 

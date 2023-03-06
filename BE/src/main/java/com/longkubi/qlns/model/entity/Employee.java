@@ -82,6 +82,8 @@ public class Employee implements Serializable {
     private String refusalReason;// lý do từ chối(hoặc lý do nghỉ việc ,sa thải)
     @Column(name = "additional_request_content")
     private String additionalRequestContent; // nội dung yêu cầu bổ sung
+    @Column(name = "note")
+    private String note; // nghi chú thích thêm quá trình công tác ở đâu về....
     @Column(name = "status")
     private byte status;
     @Column(name = "creator")

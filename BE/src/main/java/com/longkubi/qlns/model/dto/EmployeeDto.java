@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.longkubi.qlns.common.Constant;
 import com.longkubi.qlns.model.entity.Employee;
+import com.longkubi.qlns.model.entity.EmployeeHistory;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,6 +16,7 @@ import org.modelmapper.ModelMapper;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -87,6 +89,8 @@ public class EmployeeDto {
 
     private String additionalRequestContent; // nội dung yêu cầu bổ sung
 
+    private String note; // nghi chú thích thêm quá trình công tác ở đâu về....
+
     private Byte status;
 
     private String creator;
@@ -102,7 +106,7 @@ public class EmployeeDto {
 
     private Set<CommendationAndDisciplineDto> commendations;// ds khen thưởng kỉ luật
 
-      //@JsonBackReference
+    //@JsonBackReference
     private ContractDto contract;//Hợp Đồng
 
     private DepartmentDto department;//Phòng Ban Làm Việc Của Nhân Viên
@@ -122,12 +126,15 @@ public class EmployeeDto {
     //
 //    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 //    private Set<Salary> salaries;
+    Set<EmployeeHistoryDto> employeeHistories = new HashSet<>();
     private static ModelMapper modelMapper = new ModelMapper();
 
     public static EmployeeDto convertFromEntityToDto(Employee entity) {
         EmployeeDto dto = modelMapper.map(entity, EmployeeDto.class);
         dto.setDepartment(modelMapper.map(entity.getDepartment(), DepartmentDto.class));
         dto.setPositions(entity.getPositions().stream().map(PositionDto::convertFromEntityToDto).collect(Collectors.toSet()));
+        //dto.setCandidateProfileDto(modelMapper.map(entity.getDepartment(), CandidateProfileDto.class));
+        dto.setEmployeeHistories(entity.getEmployeeHistories().stream().map(his -> modelMapper.map(his, EmployeeHistoryDto.class)).collect(Collectors.toSet()));
         // dto.setCertificate(modelMapper.map(entity.getCertificate(), CertificateDto.class));
         return dto;
     }

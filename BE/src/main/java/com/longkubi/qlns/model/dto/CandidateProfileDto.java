@@ -50,6 +50,7 @@ public class CandidateProfileDto {
     private String skill;// các kĩ năng biết
     private String careerGoals;// mục tiêu nghề nghiệp
     private Byte status;//trạng thái
+    private String titleRecruit;// ví trí làm việc
     private List<RecruitDto> recruitDtos = new ArrayList<>();//Job Tuyển Dụng
     private String creator;
     private Date dateCreated;
