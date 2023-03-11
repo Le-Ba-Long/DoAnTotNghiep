@@ -1,0 +1,41 @@
+.font-20 {
+  font-size: 20px;
+  line-height: 1.5;
+}
+.uppercase {
+  text-transform: uppercase;
+}
+.fw-600 {
+  font-weight: 600;
+}
+.font-18 {
+  font-size: 18px;
+  line-height: 1.5;
+}
+.mr-10 {
+  margin-right: 10px !important;
+}
+.dotted {
+  .MuiInputBase-root {
+    .MuiInputBase-input {
+      //     // border-bottom:1px dotted #000;
+      //     // text-decoration: underline 1px dotted ;
+      //     // line-height: 2;
+      //     // text-underline-offset: 5px;
+      background-attachment: local;
+      background-image: linear-gradient(to right, transparent 10px, transparent 10px),
+        linear-gradient(to left, transparent 10px, transparent 10px),
+        repeating-linear-gradient(transparent, transparent 30px, #ccc 30px, transparent 31px);
+      line-height: 31px;
+      &:hover,
+      &:focus {
+        background-image: linear-gradient(to right, transparent 10px, transparent 10px),
+          linear-gradient(to left, transparent 10px, transparent 10px),
+          repeating-linear-gradient(transparent, transparent 30px, #000 30px, transparent 31px);
+      }
+    }
+  }
+}
+.pd-60 {
+  padding: 0 60px !important;
+}
