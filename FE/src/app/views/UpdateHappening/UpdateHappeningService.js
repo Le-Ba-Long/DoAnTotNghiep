@@ -7,6 +7,7 @@ const API_PATH3 = API + '/api/certificates';
 const API_PATH4 = API + '/api/languages';
 const API_PATH5 = API + '/api/departments';
 const API_PATH6 = API + '/api/positions';
+const API_PATH7 = API + '/api/employee-history/get-employee-history-by-id';
 
 export const getListEmployee = () => {
   return axios.get(API_PATH);
@@ -38,4 +39,8 @@ export const getContract = (id) => {
 
 export const editContract = (obj) => {
   return axios.put(API_PATH2 + '/' + obj?.id, obj);
+};
+
+export const getListHistoryEmployee = (id) => {
+  return axios.get(API_PATH7 + '/' + id);
 };

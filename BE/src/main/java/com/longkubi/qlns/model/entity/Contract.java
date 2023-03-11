@@ -72,4 +72,9 @@ public class Contract implements Serializable {
 
     @Column(name = "date_change")
     Date dateChange;
+
+    @PrePersist
+    public void prePersist() {
+        this.dateCreated = new Date();
+    }
 }

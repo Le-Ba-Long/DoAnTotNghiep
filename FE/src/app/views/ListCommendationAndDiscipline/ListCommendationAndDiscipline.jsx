@@ -12,7 +12,7 @@ import LoopIcon from '@mui/icons-material/Loop';
 import CommendationAndDisciplineDialog from './CommendationAndDisciplineDialog';
 import ConfirmationDialog from '../../components/ConfirmationDialog';
 import { checkStatus } from 'app/constant';
-
+import { colorTable } from 'app/constant';
 export default function ListCommendationAndDiscipline() {
   const [listCommendationAndDiscipline, setListCommendationAndDiscipline] = useState([]);
   const [shouldOpenViewDialog, setShouldOpenViewDialog] = useState(false);
@@ -179,6 +179,12 @@ export default function ListCommendationAndDiscipline() {
               pageSizeOptions: [10, 20, 50],
               headerStyle: {
                 textAlign: 'center',
+                backgroundColor: colorTable.HEADER,
+                color: colorTable.TEXTHEADER,
+              },
+              rowStyle: {
+                backgroundColor: colorTable.ROW,
+                color: colorTable.TEXTROW,
               },
             }}
             isLoading={loading}

@@ -4,14 +4,11 @@ import com.longkubi.qlns.common.Constant;
 import com.longkubi.qlns.common.ErrorMessage;
 import com.longkubi.qlns.model.dto.CommendationAndDisciplineDto;
 import com.longkubi.qlns.model.dto.EmployeeDto;
-import com.longkubi.qlns.model.dto.PositionDto;
 import com.longkubi.qlns.model.dto.ResponseData;
 import com.longkubi.qlns.model.dto.search.CommendationAndDisciplineSearchDto;
-import com.longkubi.qlns.model.entity.CommendationAndDiscipline;
-import com.longkubi.qlns.model.entity.Employee;
-import com.longkubi.qlns.model.entity.EmployeeHistory;
-import com.longkubi.qlns.model.entity.Recruit;
+import com.longkubi.qlns.model.entity.*;
 import com.longkubi.qlns.repository.CommendationAndDisciplineRepository;
+import com.longkubi.qlns.repository.ContractRepository;
 import com.longkubi.qlns.repository.EmployeeHistoryRepository;
 import com.longkubi.qlns.repository.EmployeeRepository;
 import com.longkubi.qlns.security.jwt.JwtProvider;
@@ -29,8 +26,7 @@ import javax.persistence.Query;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.longkubi.qlns.common.Constant.StatusType.FINISHED;
-import static com.longkubi.qlns.common.Constant.StatusType.OFFICIAL_STAFF;
+import static com.longkubi.qlns.common.Constant.StatusType.*;
 import static com.longkubi.qlns.common.ErrorMessage.*;
 
 @Service
@@ -38,6 +34,9 @@ import static com.longkubi.qlns.common.ErrorMessage.*;
 public class CommendationAndDisciplineServiceImpl implements ICommendationAndDisciplineService {
     @Autowired
     private CommendationAndDisciplineRepository repo;
+
+    @Autowired
+    private ContractRepository contractRepo;
     @Autowired
     private ModelMapper modelMapper;
     @Autowired
@@ -255,58 +254,81 @@ public class CommendationAndDisciplineServiceImpl implements ICommendationAndDis
     }
 
     private void saveEmployeeHistory(CommendationAndDisciplineDto commendationAndDisciplineDto) {
-        EmployeeHistory employeeHistory = new EmployeeHistory();
-        Employee employee = null;
-        String titleRecruit = null;
-        if (commendationAndDisciplineDto.getEmployeeDto().getId() != null) {
-            employee = employeeRepository.getEmployeeById(commendationAndDisciplineDto.getEmployeeDto().getId());
-        }
-        assert employee != null;
-        for (Recruit recruit : employee.getCandidateProfile().getRecruit()) {
-            titleRecruit = recruit.getTitleRecruit();
-        }
-        String nameDepartment = commendationAndDisciplineDto.getEmployeeDto().getDepartment().getName();
-        String workingPosition = null;
-        byte status = commendationAndDisciplineDto.getStatus();
-        byte type = commendationAndDisciplineDto.getType();
-        EmployeeDto employeeDto = commendationAndDisciplineDto.getEmployeeDto();
-        for (PositionDto position : employeeDto.getPositions()) {
-            workingPosition = position.getName();
-        }
-        if (status == FINISHED.getType() && type == 1) {
-            employeeHistory.setDate(commendationAndDisciplineDto.getDateChange() == null ? commendationAndDisciplineDto.getDateCreated() : commendationAndDisciplineDto.getDateChange());
-            if (StringUtils.hasText(titleRecruit)) {
-                employeeHistory.setTitleRecruit(titleRecruit);
-                employeeHistory.setWorkingPosition(workingPosition);
-                employeeHistory.setEvent("Nhân Viên Bị Kỉ Luật");
+        if (!(Arrays.asList(PENDING.getType(), FIX_REQUEST.getType(), NEW_SAVE.getType(), APPROVED.getType()).contains(commendationAndDisciplineDto.getStatus()))) {
+            EmployeeHistory employeeHistory = new EmployeeHistory();
+            Employee employee = null;
+            String titleRecruit = null;
+            EmployeeDto employeeDto = commendationAndDisciplineDto.getEmployeeDto();
+            //    ContractDto contract = commendationAndDisciplineDto.getEmployeeDto().getContract();
+            Integer basicSalary = commendationAndDisciplineDto.getBasicSalary();
+            Float coefficientSalary = commendationAndDisciplineDto.getCoefficientSalary();
+            Integer hourlyRate = commendationAndDisciplineDto.getHourlyRate();
+            if (commendationAndDisciplineDto.getEmployeeDto().getId() != null) {
+                employee = employeeRepository.getEmployeeById(employeeDto.getId());
             }
-            employeeHistory.setStatus(OFFICIAL_STAFF.getType());
-            employeeHistory.setReason(commendationAndDisciplineDto.getReason());
-            employeeHistory.setWorkingDepartment(nameDepartment);
-            employeeHistory.setEmployeeHistory(modelMapper.map(employeeDto, Employee.class));
-        } else if (status == FINISHED.getType() && type == 2) {
-            employeeHistory.setDate(commendationAndDisciplineDto.getDateChange() == null ? commendationAndDisciplineDto.getDateCreated() : commendationAndDisciplineDto.getDateChange());
-            if (StringUtils.hasText(titleRecruit)) {
-                employeeHistory.setTitleRecruit(titleRecruit);
-                employeeHistory.setWorkingPosition(workingPosition);
-                employeeHistory.setEvent("Nhân Viên Được Khen Thưởng");
+            assert employee != null;
+            titleRecruit = employee.getTitleRecruit();
+            String nameDepartment = employeeDto.getDepartment().getName();
+            String workingPosition = null;
+            byte status = commendationAndDisciplineDto.getStatus();
+            byte type = commendationAndDisciplineDto.getType();
+            for (Position position : employee.getPositions()) {
+                workingPosition = position.getName();
             }
-            employeeHistory.setWorkingDepartment(nameDepartment);
-            employeeHistory.setStatus(OFFICIAL_STAFF.getType());
-            employeeHistory.setReason(commendationAndDisciplineDto.getReason());
-            employeeHistory.setEmployeeHistory(modelMapper.map(employeeDto, Employee.class));
-        } else if (status == FINISHED.getType() && type == 3) {
-            employeeHistory.setDate(commendationAndDisciplineDto.getDateChange() == null ? commendationAndDisciplineDto.getDateCreated() : commendationAndDisciplineDto.getDateChange());
-            if (StringUtils.hasText(titleRecruit)) {
-                employeeHistory.setTitleRecruit(titleRecruit);
-                employeeHistory.setWorkingPosition(workingPosition);
-                employeeHistory.setEvent("Nhân Viên Được Tăng Lương");
+            String s = "- Vị trí làm việc: " + titleRecruit + "\n- Chức vụ làm việc: " + workingPosition + "\n- Phòng ban làm việc: " + nameDepartment + "\n- Mức lương cơ bản: " + basicSalary + "\n- Hệ số lương: " + coefficientSalary + "\n- Số tiền tính cho một giờ làm thêm: " + hourlyRate;
+            if (status == FINISHED.getType() && type == 1) {
+                employeeHistory.setDate(commendationAndDisciplineDto.getDateChange() == null ? commendationAndDisciplineDto.getDateCreated() : commendationAndDisciplineDto.getDateChange());
+                if (StringUtils.hasText(titleRecruit)) {
+                    Contract contract = employee.getContract();
+                    basicSalary = contract.getBasicSalary();
+                    coefficientSalary = contract.getCoefficientSalary();
+                    hourlyRate = contract.getHourlyRate();
+                    s = "- Vị trí làm việc: " + titleRecruit
+                            + "\n- Chức vụ làm việc: " + workingPosition
+                            + "\n- Phòng ban làm việc: " + nameDepartment
+                            + "\n- Mức lương cơ bản: " + basicSalary
+                            + "\n- Hệ số lương: " + coefficientSalary
+                            + "\n- Số tiền tính cho một giờ làm thêm: " + hourlyRate
+                            + "\n- Số tiền Bị Phạt: " +commendationAndDisciplineDto.getRewardDisciplineLevel() ;
+                    employeeHistory.setDescription(s);
+                    employeeHistory.setEvent("Nhân Viên Bị Kỉ Luật");
+                }
+                employeeHistory.setStatus(OFFICIAL_STAFF.getType());
+                employeeHistory.setEmployeeHistory(modelMapper.map(employeeDto, Employee.class));
+            } else if (status == FINISHED.getType() && type == 2) {
+                employeeHistory.setDate(commendationAndDisciplineDto.getDateChange() == null ? commendationAndDisciplineDto.getDateCreated() : commendationAndDisciplineDto.getDateChange());
+                if (StringUtils.hasText(titleRecruit)) {
+                    employeeHistory.setDescription(s);
+                    Contract contract = employee.getContract();
+                    basicSalary = contract.getBasicSalary();
+                    coefficientSalary = contract.getCoefficientSalary();
+                    hourlyRate = contract.getHourlyRate();
+                    s = "- Vị trí làm việc: " + titleRecruit
+                            + "\n- Chức vụ làm việc: " + workingPosition
+                            + "\n- Phòng ban làm việc: " + nameDepartment
+                            + "\n- Mức lương cơ bản: " + basicSalary
+                            + "\n- Hệ số lương: " + coefficientSalary
+                            + "\n- Số tiền tính cho một giờ làm thêm: " + hourlyRate
+                            + "\n- Số tiền Được Thưởng: " +commendationAndDisciplineDto.getRewardDisciplineLevel() ;
+                    employeeHistory.setEvent("Nhân Viên Được Khen Thưởng");
+                }
+                employeeHistory.setStatus(OFFICIAL_STAFF.getType());
+                employeeHistory.setEmployeeHistory(modelMapper.map(employeeDto, Employee.class));
+            } else if (status == FINISHED.getType() && type == 3) {
+                employeeHistory.setDate(commendationAndDisciplineDto.getDateChange() == null ? commendationAndDisciplineDto.getDateCreated() : commendationAndDisciplineDto.getDateChange());
+                if (StringUtils.hasText(titleRecruit)) {
+                    employeeHistory.setDescription(s);
+                    Contract contract = employee.getContract();
+                    contract.setBasicSalary(basicSalary);
+                    contract.setCoefficientSalary(coefficientSalary);
+                    contract.setHourlyRate(hourlyRate);
+                    contractRepo.save(contract);
+                    employeeHistory.setEvent("Nhân Viên Được Tăng Lương");
+                }
+                employeeHistory.setStatus(OFFICIAL_STAFF.getType());
+                employeeHistory.setEmployeeHistory(modelMapper.map(employeeDto, Employee.class));
             }
-            employeeHistory.setReason(commendationAndDisciplineDto.getReason());
-            employeeHistory.setWorkingDepartment(nameDepartment);
-            employeeHistory.setStatus(OFFICIAL_STAFF.getType());
-            employeeHistory.setEmployeeHistory(modelMapper.map(employeeDto, Employee.class));
+            employeeHistoryRepository.save(employeeHistory);
         }
-        employeeHistoryRepository.save(employeeHistory);
     }
 }

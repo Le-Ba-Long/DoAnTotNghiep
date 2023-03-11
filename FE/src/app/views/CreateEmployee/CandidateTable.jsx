@@ -13,7 +13,7 @@ import MaterialTable from 'material-table';
 import { getListCandidate } from './EmployeeService';
 import { toast } from 'react-toastify';
 import EmployeeDialog from './EmployeeDialog';
-
+import { colorTable } from 'app/constant';
 export default function CandidateTable(props) {
   const { open, handleClose } = props;
   const [listCandidate, setListCandidate] = useState([]);
@@ -153,6 +153,12 @@ export default function CandidateTable(props) {
               pageSizeOptions: [10, 20, 50],
               headerStyle: {
                 textAlign: 'center',
+                backgroundColor: colorTable.HEADER,
+                color: colorTable.TEXTHEADER,
+              },
+              rowStyle: {
+                backgroundColor: colorTable.ROW,
+                color: colorTable.TEXTROW,
               },
             }}
             localization={{

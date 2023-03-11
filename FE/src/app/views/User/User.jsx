@@ -9,7 +9,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { toast } from 'react-toastify';
 import UserDialog from './UserDialog';
 import ConfirmationDialog from '../../components/ConfirmationDialog';
-
+import { colorTable } from 'app/constant';
 export default function User() {
   const [listUser, setListUser] = useState([]);
   const [shouldOpenDialog, setShouldOpenDialog] = useState(false);
@@ -54,7 +54,7 @@ export default function User() {
         </>
       ),
       cellStyle: {
-        width: '10%',
+        width: '5%',
         textAlign: 'center',
       },
     },
@@ -63,7 +63,7 @@ export default function User() {
       field: 'fullName',
       render: (rowData) => rowData?.fullName,
       cellStyle: {
-        width: '10%',
+        width: '7%',
         textAlign: 'left',
       },
       headerStyle: {
@@ -75,7 +75,7 @@ export default function User() {
       field: 'userName',
       render: (rowData) => rowData?.userName,
       cellStyle: {
-        width: '10%',
+        width: '7%',
         textAlign: 'center',
       },
       headerStyle: {
@@ -87,7 +87,7 @@ export default function User() {
       field: 'email',
       render: (rowData) => rowData?.email,
       cellStyle: {
-        width: '10%',
+        width: '7%',
         textAlign: 'center',
       },
       headerStyle: {
@@ -163,6 +163,12 @@ export default function User() {
             pageSizeOptions: [10, 20, 50],
             headerStyle: {
               textAlign: 'center',
+              backgroundColor: colorTable.HEADER,
+              color: colorTable.TEXTHEADER,
+            },
+            rowStyle: {
+              backgroundColor: colorTable.ROW,
+              color: colorTable.TEXTROW,
             },
           }}
           isLoading={loading}

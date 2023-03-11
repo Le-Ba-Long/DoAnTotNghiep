@@ -61,8 +61,17 @@ input::-webkit-inner-spin-button {
 }
 
 .status-approved {
-  color: #fbfbfb;
-  background-color: #07bc0c;
+  color: #fbf4f9;
+  background-color: #60a9a6;
+  padding: 5px 0;
+  width: 65%;
+  text-align: center;
+  font-size: 12px;
+}
+
+.status-transfer {
+  color: #fbf4f9;
+  background-color: #ec9b3b;
   padding: 5px 0;
   width: 65%;
   text-align: center;

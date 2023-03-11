@@ -47,7 +47,7 @@ export const navigations = [
       { name: 'Tạo hồ sơ nhân viên', path: '/manage/create-employee' },
       { name: 'Cập nhật diễn biến', path: '/manage/update-happening' },
       { name: 'QĐ Tăng lương', path: '/manage/promote' },
-      { name: 'Báo cáo thống kê', path: '/session/signin' },
+      { name: 'Báo cáo thống kê', path: '/manage/statistic-report' },
     ],
     role: ['ADMIN', 'HR'],
   },

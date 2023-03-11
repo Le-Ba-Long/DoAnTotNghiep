@@ -19,6 +19,7 @@ import Grid from '@mui/material/Grid';
 import ConfirmationDialog from '../../components/ConfirmationDialog';
 import { deleteListTimeKeeping } from './TimeKeepingService';
 import TimeKeepingDialog from './TimeKeepingDialog';
+import { colorTable } from 'app/constant';
 
 export default function TimeKeepingTable(props) {
   const { open, handleClose, item } = props;
@@ -92,17 +93,21 @@ export default function TimeKeepingTable(props) {
         width: '5%',
         textAlign: 'center',
       },
+      headerStyle: {
+        width: '5%',
+        textAlign: 'center',
+      },
     },
     {
       title: 'Năm',
       field: 'year',
       render: (rowData) => rowData?.year,
       cellStyle: {
-        width: '5%',
+        width: '4%',
         textAlign: 'center',
       },
       headerStyle: {
-        width: '5%',
+        width: '4%',
         textAlign: 'center',
       },
     },
@@ -111,11 +116,11 @@ export default function TimeKeepingTable(props) {
       field: 'month',
       render: (rowData) => rowData?.month,
       cellStyle: {
-        width: '5%',
+        width: '4%',
         textAlign: 'center',
       },
       headerStyle: {
-        width: '5%',
+        width: '4%',
         textAlign: 'center',
       },
     },
@@ -137,11 +142,11 @@ export default function TimeKeepingTable(props) {
       field: 'numberDayOff',
       render: (rowData) => rowData?.numberDayOff,
       cellStyle: {
-        width: '8%',
+        width: '10%',
         textAlign: 'center',
       },
       headerStyle: {
-        width: '8%',
+        width: '10%',
         textAlign: 'center',
       },
     },
@@ -150,11 +155,11 @@ export default function TimeKeepingTable(props) {
       field: 'numberDayUnexcusedLeave',
       render: (rowData) => rowData?.numberDayUnexcusedLeave,
       cellStyle: {
-        width: '8%',
+        width: '10%',
         textAlign: 'center',
       },
       headerStyle: {
-        width: '8%',
+        width: '10%',
         textAlign: 'center',
       },
     },
@@ -237,7 +242,7 @@ export default function TimeKeepingTable(props) {
           </Box>
         </DialogTitle>
         <DialogContent>
-          <Box style={{ margin: 20 }}>
+          <Box>
             <Grid container spacing={1} style={{ margin: '20px 0' }}>
               <Grid item xs={7}>
                 <Button
@@ -305,6 +310,12 @@ export default function TimeKeepingTable(props) {
                 draggable: false,
                 headerStyle: {
                   textAlign: 'center',
+                  backgroundColor: colorTable.HEADER,
+                  color: colorTable.TEXTHEADER,
+                },
+                rowStyle: {
+                  backgroundColor: colorTable.ROW,
+                  color: colorTable.TEXTROW,
                 },
               }}
               isLoading={loading}

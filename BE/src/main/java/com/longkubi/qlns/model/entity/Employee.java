@@ -94,6 +94,8 @@ public class Employee implements Serializable {
     String changedBy;
     @Column(name = "date_change")
     Date dateChange;
+    @Column(name = "title_recruit")
+    private String titleRecruit;// ví trí làm việc
     @ManyToMany
     @JoinTable(name = "tbl_employee_language", joinColumns = @JoinColumn(name = "employee_code"),
             inverseJoinColumns = @JoinColumn(name = "language_code"))

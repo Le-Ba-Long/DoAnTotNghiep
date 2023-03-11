@@ -53,14 +53,14 @@ export default function EmployeeView(props) {
   return (
     <>
       <Dialog open={open} fullWidth maxWidth={'md'}>
-        <DialogTitle>
+        <DialogTitle sx={{ bgcolor: '#EDF1D6' }}>
           <Box className="icon-close" onClick={handleClose}>
             <IconButton color="error">
               <CloseIcon />
             </IconButton>
           </Box>
         </DialogTitle>
-        <DialogContent style={{ padding: '30px 60px 30px' }}>
+        <DialogContent style={{ padding: '30px 60px 30px' }} sx={{ bgcolor: '#EDF1D6' }}>
           <Grid
             container
             spacing={2}
@@ -162,9 +162,9 @@ export default function EmployeeView(props) {
             <Grid item container xs={12} className="pd-60 fw-600">
               II. THÔNG TIN LIÊN QUAN
             </Grid>
-            <Grid item container xs={12} className="pd-60 ml-10" spacing={1}>
+            <Grid item container xs={12} className="pd-60" spacing={1}>
               <Grid item container xs={6}>
-                <Grid item className="fw-600 mr-10">
+                <Grid item className="fw-600 mr-10 ml-10">
                   Số CCCD:
                 </Grid>
                 <Grid item xs={7}>
@@ -172,7 +172,7 @@ export default function EmployeeView(props) {
                 </Grid>
               </Grid>
               <Grid item container xs={6}>
-                <Grid item className="fw-600 mr-10">
+                <Grid item className="fw-600 mr-10 ml-10">
                   Ngày cấp:
                 </Grid>
                 <Grid item xs={7}>
@@ -180,9 +180,9 @@ export default function EmployeeView(props) {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item container xs={12} className="pd-60 ml-10" spacing={1}>
+            <Grid item container xs={12} className="pd-60" spacing={1}>
               <Grid item container xs={12}>
-                <Grid item className="fw-600 mr-10">
+                <Grid item className="fw-600 mr-10 ml-10">
                   Nơi cấp:
                 </Grid>
                 <Grid item xs={7}>
@@ -190,7 +190,7 @@ export default function EmployeeView(props) {
                 </Grid>
               </Grid>
               <Grid item container xs={6}>
-                <Grid item className="fw-600 mr-10">
+                <Grid item className="fw-600 mr-10 ml-10">
                   Dân tộc:
                 </Grid>
                 <Grid item xs={7}>
@@ -198,7 +198,7 @@ export default function EmployeeView(props) {
                 </Grid>
               </Grid>
               <Grid item container xs={6}>
-                <Grid item className="fw-600 mr-10">
+                <Grid item className="fw-600 mr-10 ml-10">
                   Tôn giáo:
                 </Grid>
                 <Grid item xs={7}>
@@ -206,9 +206,9 @@ export default function EmployeeView(props) {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item container xs={12} className="pd-60 ml-10" spacing={1}>
+            <Grid item container xs={12} className="pd-60" spacing={1}>
               <Grid item container xs={6}>
-                <Grid item className="fw-600 mr-10">
+                <Grid item className="fw-600 mr-10 ml-10">
                   Số bảo hiểm y tế:
                 </Grid>
                 <Grid item xs={5}>
@@ -216,7 +216,7 @@ export default function EmployeeView(props) {
                 </Grid>
               </Grid>
               <Grid item container xs={6}>
-                <Grid item className="fw-600 mr-10">
+                <Grid item className="fw-600 mr-10 ml-10">
                   Ngày cấp:
                 </Grid>
                 <Grid item xs={6}>
@@ -226,7 +226,7 @@ export default function EmployeeView(props) {
                 </Grid>
               </Grid>
               <Grid item container xs={12}>
-                <Grid item className="fw-600 mr-10">
+                <Grid item className="fw-600 mr-10 ml-10">
                   Nơi cấp:
                 </Grid>
                 <Grid item xs={7}>
@@ -234,9 +234,9 @@ export default function EmployeeView(props) {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item container xs={12} className="pd-60 ml-10" spacing={1}>
+            <Grid item container xs={12} className="pd-60" spacing={1}>
               <Grid item container xs={6}>
-                <Grid item className="fw-600 mr-10">
+                <Grid item className="fw-600 mr-10 ml-10">
                   Số bảo hiểm xã hội:
                 </Grid>
                 <Grid item xs={5}>
@@ -244,7 +244,7 @@ export default function EmployeeView(props) {
                 </Grid>
               </Grid>
               <Grid item container xs={6}>
-                <Grid item className="fw-600 mr-10">
+                <Grid item className="fw-600 mr-10 ml-10">
                   Ngày cấp:
                 </Grid>
                 <Grid item xs={6}>
@@ -254,7 +254,7 @@ export default function EmployeeView(props) {
                 </Grid>
               </Grid>
               <Grid item container xs={12}>
-                <Grid item className="fw-600 mr-10">
+                <Grid item className="fw-600 mr-10 ml-10">
                   Nơi cấp:
                 </Grid>
                 <Grid item xs={7}>
@@ -263,10 +263,10 @@ export default function EmployeeView(props) {
               </Grid>
             </Grid>
             <Grid item container xs={12} spacing={1}>
-              <Grid item container xs={12} className="pd-60 fw-600">
+              <Grid item container xs={12} className="fw-600" style={{ padding: '0 50px' }}>
                 III. VỊ TRÍ LÀM VIỆC
               </Grid>
-              <Grid item container xs={12} className="pd-60 ml-10">
+              <Grid item container xs={12} className="pd-60">
                 <Grid item className="fw-600 mr-10">
                   Phòng ban:
                 </Grid>
@@ -274,7 +274,7 @@ export default function EmployeeView(props) {
                   {item?.department?.name}
                 </Grid>
               </Grid>
-              <Grid item container xs={12} className="pd-60 ml-10">
+              <Grid item container xs={12} className="pd-60">
                 <Grid item className="fw-600 mr-10">
                   Vị trí công việc:
                 </Grid>
@@ -282,10 +282,10 @@ export default function EmployeeView(props) {
                   {item?.positions[0]?.name}
                 </Grid>
               </Grid>
-              <Grid item container xs={12} className="pd-60 fw-600">
+              <Grid item container xs={12} className="fw-600" style={{ padding: '0 50px' }}>
                 IV. TRÌNH ĐỘ CHUYÊN MÔN
               </Grid>
-              <Grid item container xs={12} className="pd-60 ml-10">
+              <Grid item container xs={12} className="pd-60">
                 <Grid item className="fw-600 mr-10">
                   Trình độ học vấn:
                 </Grid>
@@ -293,7 +293,7 @@ export default function EmployeeView(props) {
                   {item?.education}
                 </Grid>
               </Grid>
-              <Grid item container xs={12} className="pd-60 ml-10">
+              <Grid item container xs={12} className="pd-60">
                 <Grid item className="fw-600 mr-10">
                   Chuyên ngành:
                 </Grid>
@@ -301,7 +301,7 @@ export default function EmployeeView(props) {
                   {item?.major}
                 </Grid>
               </Grid>
-              <Grid item container xs={12} className="pd-60 ml-10">
+              <Grid item container xs={12} className="pd-60">
                 <Grid item className="fw-600 mr-10">
                   Bằng cấp:
                 </Grid>
@@ -309,7 +309,7 @@ export default function EmployeeView(props) {
                   {item?.certificate?.name}
                 </Grid>
               </Grid>
-              <Grid item container xs={12} className="pd-60 ml-10">
+              <Grid item container xs={12} className="pd-60">
                 <Grid item className="fw-600 mr-10">
                   Danh sách chứng chỉ:
                 </Grid>
@@ -335,7 +335,7 @@ export default function EmployeeView(props) {
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ bgcolor: '#EDF1D6' }}>
           <Button variant="contained" color="secondary" onClick={handleClose}>
             Hủy
           </Button>

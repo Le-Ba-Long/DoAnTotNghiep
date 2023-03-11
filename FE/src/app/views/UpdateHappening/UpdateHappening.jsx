@@ -12,7 +12,7 @@ import LoopIcon from '@mui/icons-material/Loop';
 import Grid from '@mui/material/Grid';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
-
+import { colorTable } from 'app/constant';
 export default function UpdateHappening() {
   const [listEmployee, setListEmployee] = useState([]);
   const [shouldOpenConfirmDialog, setShouldOpenConfirmDialog] = useState(false);
@@ -214,6 +214,12 @@ export default function UpdateHappening() {
               pageSizeOptions: [10, 20, 50],
               headerStyle: {
                 textAlign: 'center',
+                backgroundColor: colorTable.HEADER,
+                color: colorTable.TEXTHEADER,
+              },
+              rowStyle: {
+                backgroundColor: colorTable.ROW,
+                color: colorTable.TEXTROW,
               },
             }}
             isLoading={loading}
