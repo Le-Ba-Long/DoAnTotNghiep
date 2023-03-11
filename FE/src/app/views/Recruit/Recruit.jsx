@@ -18,7 +18,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { trangThaiKeHoanhTD } from 'app/constant';
 import './Recruit.scss';
-
+import { colorTable } from 'app/constant';
 export default function Recruit() {
   const [listRecruit, setListRecruit] = useState([]);
   const [shouldOpenDialog, setShouldOpenDialog] = useState(false);
@@ -251,6 +251,12 @@ export default function Recruit() {
             draggable: false,
             headerStyle: {
               textAlign: 'center',
+              backgroundColor: colorTable.HEADER,
+              color: colorTable.TEXTHEADER,
+            },
+            rowStyle: {
+              backgroundColor: colorTable.ROW,
+              color: colorTable.TEXTROW,
             },
           }}
           isLoading={loading}

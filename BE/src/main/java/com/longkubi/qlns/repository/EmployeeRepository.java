@@ -25,6 +25,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
     @Query("select e from Employee e where MONTH(e.dateOfBirth) between :startMonth and  :endMonth ORDER BY e.dateOfBirth ASC")
     List<Employee> getEmployeeBirthdayInRange(@Param("startMonth") int startMonth, @Param("endMonth") int endMonth);//lấy ra danh sách nhân viên có sinh nhật trong tháng nhập vào
 
+
     @Query("select e from Employee e  where  e.contract is  null and e.status = 3  ORDER BY e.dateCreated ASC  ")
     List<Employee> getEmployeesWithoutContract();
 
@@ -33,6 +34,9 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
 
     @Query("SELECT MONTH(e.dateChange),YEAR(e.dateChange), COUNT(e.id) FROM Employee e WHERE e.status = 15 GROUP BY CONCAT(MONTH(e.dateChange), '-', YEAR(e.dateChange)) order by e.dateChange ASC")
     List<Object[]> personnelAttritionReport();// báo cáo biến động tiếp nhận nhân sự nghỉ việc
+
+    @Query("SELECT MONTH(e.dateChange),YEAR(e.dateChange), COUNT(e.id) FROM Employee e WHERE e.status = 15 GROUP BY CONCAT(MONTH(e.dateChange), '-', YEAR(e.dateChange)) order by e.dateChange ASC")
+    List<Object[]> get();// báo cáo biến động tiếp nhận nhân sự nghỉ việc
 
     @Query("SELECT d.name,count(e.id) from Department d  left JOIN Employee e on d.id = e.department.id group by d.id")
     List<Object[]> getEmployeeCountByDepartment();// báo cáo tỉ lệ  nhân sự phân bổ theo từng phòng ban

@@ -11,7 +11,7 @@ import { toast } from 'react-toastify';
 import CertificateDialog from './CertificateDialog';
 import ConfirmationDialog from '../../components/ConfirmationDialog';
 import LoopIcon from '@mui/icons-material/Loop';
-
+import { colorTable } from 'app/constant';
 export default function Certificate() {
   const [listCertificate, setListCertificate] = useState([]);
   const [shouldOpenDialog, setShouldOpenDialog] = useState(false);
@@ -66,7 +66,7 @@ export default function Certificate() {
         </>
       ),
       cellStyle: {
-        width: '10%',
+        width: '7%',
         textAlign: 'center',
       },
     },
@@ -75,7 +75,7 @@ export default function Certificate() {
       field: 'code',
       render: (rowData) => rowData?.code,
       cellStyle: {
-        width: '10%',
+        width: '5%',
         textAlign: 'center',
       },
     },
@@ -198,6 +198,12 @@ export default function Certificate() {
             draggable: false,
             headerStyle: {
               textAlign: 'center',
+              backgroundColor: colorTable.HEADER,
+              color: colorTable.TEXTHEADER,
+            },
+            rowStyle: {
+              backgroundColor: colorTable.ROW,
+              color: colorTable.TEXTROW,
             },
           }}
           isLoading={loading}

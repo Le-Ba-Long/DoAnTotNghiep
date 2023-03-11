@@ -37,7 +37,7 @@ export default function UpdateSalary(props) {
       hourlyRate: contract?.employee ? contract.hourlyRate : '',
       coefficientSalary: contract?.employee ? contract.coefficientSalary : '',
       status: contract?.employee ? contract.status : '',
-      employee: item,
+      // employee: item,
     },
     enableReinitialize: true,
     validateOnChange: false,

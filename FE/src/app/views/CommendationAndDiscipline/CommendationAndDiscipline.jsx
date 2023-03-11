@@ -16,7 +16,7 @@ import CommendationAndDisciplineDialog from './CommendationAndDisciplineDialog';
 import ConfirmationDialog from '../../components/ConfirmationDialog';
 import { checkStatus } from 'app/constant';
 import EmployeeTable from './EmployeeTable';
-
+import { colorTable } from 'app/constant';
 export default function CommendationAndDiscipline() {
   const [listCommendationAndDiscipline, setListCommendationAndDiscipline] = useState([]);
   const [shouldOpenDialog, setShouldOpenDialog] = useState(false);
@@ -226,6 +226,12 @@ export default function CommendationAndDiscipline() {
               pageSizeOptions: [10, 20, 50],
               headerStyle: {
                 textAlign: 'center',
+                backgroundColor: colorTable.HEADER,
+                color: colorTable.TEXTHEADER,
+              },
+              rowStyle: {
+                backgroundColor: colorTable.ROW,
+                color: colorTable.TEXTROW,
               },
             }}
             isLoading={loading}

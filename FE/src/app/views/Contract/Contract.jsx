@@ -11,7 +11,7 @@ import { checkStatus } from 'app/constant';
 import ContractDialog from './ContractDialog';
 import EmployeeTable from './EmployeeTable';
 import LoopIcon from '@mui/icons-material/Loop';
-
+import { colorTable } from 'app/constant';
 export default function Contract() {
   const [listContract, setListContract] = useState([]);
   const [shouldOpenDialog, setShouldOpenDialog] = useState(false);
@@ -170,6 +170,12 @@ export default function Contract() {
             draggable: false,
             headerStyle: {
               textAlign: 'center',
+              backgroundColor: colorTable.HEADER,
+              color: colorTable.TEXTHEADER,
+            },
+            rowStyle: {
+              backgroundColor: colorTable.ROW,
+              color: colorTable.TEXTROW,
             },
           }}
           isLoading={loading}

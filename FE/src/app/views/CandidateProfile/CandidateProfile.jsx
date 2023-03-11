@@ -13,6 +13,7 @@ import CandidateProfileDialog from './CandidateProfileDialog';
 import ConfirmationDialog from '../../components/ConfirmationDialog';
 import CandidateProfileView from './CandidateProfileView';
 import LoopIcon from '@mui/icons-material/Loop';
+import { colorTable } from 'app/constant';
 
 export default function CandidateProfile() {
   const [listCandidate, setListCandidate] = useState([]);
@@ -215,6 +216,12 @@ export default function CandidateProfile() {
               pageSizeOptions: [10, 20, 50],
               headerStyle: {
                 textAlign: 'center',
+                backgroundColor: colorTable.HEADER,
+                color: colorTable.TEXTHEADER,
+              },
+              rowStyle: {
+                backgroundColor: colorTable.ROW,
+                color: colorTable.TEXTROW,
               },
             }}
             isLoading={loading}

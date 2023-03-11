@@ -15,6 +15,7 @@ import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import { Span } from 'app/components/Typography';
+import { colorTable } from 'app/constant';
 
 export default function PaymentSalary(props) {
   const { open, handleClose, item } = props;
@@ -291,6 +292,12 @@ export default function PaymentSalary(props) {
                   draggable: false,
                   headerStyle: {
                     textAlign: 'center',
+                    backgroundColor: colorTable.HEADER,
+                    color: colorTable.TEXTHEADER,
+                  },
+                  rowStyle: {
+                    backgroundColor: colorTable.ROW,
+                    color: colorTable.TEXTROW,
                   },
                 }}
                 isLoading={loading}

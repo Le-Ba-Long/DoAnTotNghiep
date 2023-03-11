@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 import { checkStatus } from 'app/constant';
 import CandidateProfileView from './CandidateProfileView';
 import LoopIcon from '@mui/icons-material/Loop';
-
+import { colorTable } from 'app/constant';
 export default function ApproveCandidate() {
   const [listCandidate, setListCandidate] = useState([]);
   const [shouldOpenViewDialog, setShouldOpenViewDialog] = useState(false);
@@ -169,6 +169,12 @@ export default function ApproveCandidate() {
               pageSizeOptions: [10, 20, 50],
               headerStyle: {
                 textAlign: 'center',
+                backgroundColor: colorTable.HEADER,
+                color: colorTable.TEXTHEADER,
+              },
+              rowStyle: {
+                backgroundColor: colorTable.ROW,
+                color: colorTable.TEXTROW,
               },
             }}
             isLoading={loading}

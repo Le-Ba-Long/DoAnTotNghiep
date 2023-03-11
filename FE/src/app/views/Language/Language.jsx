@@ -11,7 +11,7 @@ import { toast } from 'react-toastify';
 import LanguageDialog from './LanguageDialog';
 import ConfirmationDialog from '../../components/ConfirmationDialog';
 import LoopIcon from '@mui/icons-material/Loop';
-
+import { colorTable } from 'app/constant';
 export default function Language() {
   const [listLanguage, setListLanguage] = useState([]);
   const [shouldOpenDialog, setShouldOpenDialog] = useState(false);
@@ -66,7 +66,7 @@ export default function Language() {
         </>
       ),
       cellStyle: {
-        width: '10%',
+        width: '7%',
         textAlign: 'center',
       },
     },
@@ -75,7 +75,7 @@ export default function Language() {
       field: 'code',
       render: (rowData) => rowData?.code,
       cellStyle: {
-        width: '7%',
+        width: '5%',
         textAlign: 'center',
       },
     },
@@ -84,7 +84,7 @@ export default function Language() {
       field: 'name',
       render: (rowData) => rowData?.name,
       cellStyle: {
-        width: '15%',
+        width: '10%',
         textAlign: 'left',
       },
       headerStyle: {
@@ -186,6 +186,12 @@ export default function Language() {
             draggable: false,
             headerStyle: {
               textAlign: 'center',
+              backgroundColor: colorTable.HEADER,
+              color: colorTable.TEXTHEADER,
+            },
+            rowStyle: {
+              backgroundColor: colorTable.ROW,
+              color: colorTable.TEXTROW,
             },
           }}
           isLoading={loading}

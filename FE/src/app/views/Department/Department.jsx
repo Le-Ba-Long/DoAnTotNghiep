@@ -11,7 +11,7 @@ import { toast } from 'react-toastify';
 import DepartmentDialog from './DepartmentDialog';
 import ConfirmationDialog from '../../components/ConfirmationDialog';
 import LoopIcon from '@mui/icons-material/Loop';
-
+import { colorTable } from 'app/constant';
 export default function Department() {
   const [listDepartment, setListDepartment] = useState([]);
   const [shouldOpenDialog, setShouldOpenDialog] = useState(false);
@@ -66,7 +66,7 @@ export default function Department() {
         </>
       ),
       cellStyle: {
-        width: '10%',
+        width: '5%',
         textAlign: 'center',
       },
     },
@@ -84,7 +84,7 @@ export default function Department() {
       field: 'name',
       render: (rowData) => rowData.name,
       cellStyle: {
-        width: '10%',
+        width: '7%',
         textAlign: 'left',
       },
       headerStyle: {
@@ -186,6 +186,12 @@ export default function Department() {
             draggable: false,
             headerStyle: {
               textAlign: 'center',
+              backgroundColor: colorTable.HEADER,
+              color: colorTable.TEXTHEADER,
+            },
+            rowStyle: {
+              backgroundColor: colorTable.ROW,
+              color: colorTable.TEXTROW,
             },
           }}
           isLoading={loading}

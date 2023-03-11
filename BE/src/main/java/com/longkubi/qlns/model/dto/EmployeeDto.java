@@ -91,6 +91,8 @@ public class EmployeeDto {
 
     private String note; // nghi chú thích thêm quá trình công tác ở đâu về....
 
+    private String titleRecruit;// ví trí làm việc
+
     private Byte status;
 
     private String creator;

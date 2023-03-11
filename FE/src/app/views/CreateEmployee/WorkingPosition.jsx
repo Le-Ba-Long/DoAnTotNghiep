@@ -84,6 +84,18 @@ export default function WorkingPosition(props) {
           )}
         />
       </Grid>
+      <Grid item xs={6} md={6}>
+        <TextField
+          label="Vị trí làm việc"
+          variant="outlined"
+          fullWidth
+          name="titleRecruit"
+          value={formik.values?.titleRecruit}
+          onChange={formik.handleChange}
+          error={formik.errors.titleRecruit && formik.touched.titleRecruit}
+          helperText={formik.errors.titleRecruit}
+        />
+      </Grid>
     </Grid>
   );
 }

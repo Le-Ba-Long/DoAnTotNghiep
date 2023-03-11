@@ -8,6 +8,7 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import { toast } from 'react-toastify';
 import PaymentSalaryTable from './PaymentSalaryTable';
 import LoopIcon from '@mui/icons-material/Loop';
+import { colorTable } from 'app/constant';
 
 export default function PaymentSalary() {
   const [listEmployee, setListEmployee] = useState([]);
@@ -21,7 +22,7 @@ export default function PaymentSalary() {
       field: 'STT',
       render: (rowData) => rowData.tableData.id + 1,
       cellStyle: {
-        width: '3%',
+        width: '1.5%',
         textAlign: 'center',
       },
     },
@@ -42,7 +43,7 @@ export default function PaymentSalary() {
         </>
       ),
       cellStyle: {
-        width: '10%',
+        width: '1.5%',
         textAlign: 'center',
       },
     },
@@ -51,7 +52,7 @@ export default function PaymentSalary() {
       field: 'code',
       render: (rowData) => rowData?.code,
       cellStyle: {
-        width: '10%',
+        width: '3%',
         textAlign: 'center',
       },
     },
@@ -60,7 +61,7 @@ export default function PaymentSalary() {
       field: 'name',
       render: (rowData) => rowData?.fullName,
       cellStyle: {
-        width: '10%',
+        width: '5%',
         textAlign: 'left',
       },
       headerStyle: {
@@ -72,7 +73,7 @@ export default function PaymentSalary() {
       field: 'email',
       render: (rowData) => rowData?.email,
       cellStyle: {
-        width: '10%',
+        width: '7%',
         textAlign: 'left',
       },
       headerStyle: {
@@ -84,7 +85,7 @@ export default function PaymentSalary() {
       field: 'phone',
       render: (rowData) => rowData?.phone,
       cellStyle: {
-        width: '10%',
+        width: '5%',
         textAlign: 'left',
       },
       headerStyle: {
@@ -150,6 +151,12 @@ export default function PaymentSalary() {
               draggable: false,
               headerStyle: {
                 textAlign: 'center',
+                backgroundColor: colorTable.HEADER,
+                color: colorTable.TEXTHEADER,
+              },
+              rowStyle: {
+                backgroundColor: colorTable.ROW,
+                color: colorTable.TEXTROW,
               },
             }}
             isLoading={loading}

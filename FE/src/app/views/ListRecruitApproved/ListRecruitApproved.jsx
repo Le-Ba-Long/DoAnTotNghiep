@@ -13,6 +13,7 @@ import ListRecruitApprovedView from './ListRecruitApprovedView';
 import { checkStatus } from 'app/constant';
 import './Recruit.scss';
 import LoopIcon from '@mui/icons-material/Loop';
+import { colorTable } from 'app/constant';
 
 export default function ListRecruitApproved() {
   const [listRecruit, setListRecruit] = useState([]);
@@ -169,6 +170,12 @@ export default function ListRecruitApproved() {
               draggable: false,
               headerStyle: {
                 textAlign: 'center',
+                backgroundColor: colorTable.HEADER,
+                color: colorTable.TEXTHEADER,
+              },
+              rowStyle: {
+                backgroundColor: colorTable.ROW,
+                color: colorTable.TEXTROW,
               },
             }}
             isLoading={loading}

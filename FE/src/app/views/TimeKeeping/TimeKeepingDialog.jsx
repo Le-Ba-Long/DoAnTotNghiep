@@ -131,7 +131,7 @@ export default function TimeKeepingDialog(props) {
                   validators={['required', 'maxNumber:23']}
                   errorMessages={[
                     'Vui lòng nhập trường này',
-                    'Số ngày nhập không được quá số ngày quy định đi làm',
+                    'Số ngày nhập không được quá số ngày quy định đi làm: 23 ngày',
                   ]}
                 />
               </Grid>
@@ -148,7 +148,7 @@ export default function TimeKeepingDialog(props) {
                   validators={['required', 'maxNumber:3']}
                   errorMessages={[
                     'Vui lòng nhập trường này',
-                    'Số ngày nhập không được quá số ngày quy định',
+                    'Số ngày nhập không được quá số ngày quy định: 3 ngày',
                   ]}
                 />
               </Grid>
@@ -165,7 +165,7 @@ export default function TimeKeepingDialog(props) {
                   validators={['required', 'maxNumber:2']}
                   errorMessages={[
                     'Vui lòng nhập trường này',
-                    'Số ngày nhập không được quá số ngày quy định',
+                    'Số ngày nhập không được quá số ngày quy định: 2 ngày',
                   ]}
                 />
               </Grid>

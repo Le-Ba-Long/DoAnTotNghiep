@@ -20,7 +20,6 @@ import InputAdornment from '@mui/material/InputAdornment';
 
 export default function ContractDialog(props) {
   const { open, item, handleCloseDialog, setItem } = props;
-  console.log(item);
   const formik = useFormik({
     initialValues: {
       code: item?.employee ? item.code : '',
@@ -529,12 +528,13 @@ export default function ContractDialog(props) {
               className="pd-60"
               spacing={1}
               alignItems="center"
-              style={{ marginBottom: 20 }}
+              style={{ marginBottom: 10 }}
             >
               <Grid item xs={7}></Grid>
-              <Grid item xs={5}>
-                Hà Nội, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm{' '}
-                {new Date().getFullYear()}
+              <Grid item xs={5} style={{ marginTop: '10px' }}>
+                Hà Nội, ngày {new Date(formik.values.signingDate).getDate()} tháng{' '}
+                {new Date(formik.values?.signingDate).getMonth() + 1} năm{' '}
+                {new Date(formik.values?.signingDate).getFullYear()}
               </Grid>
             </Grid>
             <Grid
@@ -590,9 +590,11 @@ export default function ContractDialog(props) {
               Hủy
             </Button>
             {item?.employee ? (
-              <Button variant="contained" color="primary" onClick={handlePrint}>
-                In
-              </Button>
+              <>
+                <Button variant="contained" color="primary" onClick={handlePrint}>
+                  In
+                </Button>
+              </>
             ) : (
               <Button type="submit" variant="contained" color="primary">
                 Tạo hợp đồng

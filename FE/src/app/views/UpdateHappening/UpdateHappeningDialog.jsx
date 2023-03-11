@@ -15,6 +15,9 @@ import InformationDialog from './InformationDialog';
 import PromoteDialog from './PromoteDialog';
 import QuitJobDialog from './QuitJobDialog';
 import HistoryDialog from './HistoryDialog';
+import ContractExtensionDialog from './ContractExtensionDialog';
+import { getListHistoryEmployee } from './UpdateHappeningService';
+import { toast } from 'react-toastify';
 
 export default function UpdateHappeningDialog(props) {
   const { open, handleClose, item } = props;
@@ -22,8 +25,22 @@ export default function UpdateHappeningDialog(props) {
   const [shouldOpenInformationDialog, setOpenInformationDialog] = useState(false);
   const [shouldOpenPromoteDialog, setOpenPromoteDialog] = useState(false);
   const [shouldOpenSalaryeDialog, setOpenSalaryDialog] = useState(false);
+  const [shouldOpenContractExtensionDialog, setOpenContractExtensionDialog] = useState(false);
   const [shouldOpenQuitJobDialog, setOpenQuitJobDialog] = useState(false);
   const [shouldOpenHistoryDialog, setOpenHistoryDialog] = useState(false);
+  const [listHistoryEmployee, setListHistoryEmployee] = useState(false);
+
+  useEffect(() => {
+    getListHistoryEmployee(item?.id)
+      .then((res) => {
+        if (res.data.statusCode === 200) {
+          setListHistoryEmployee(res.data.data);
+        } else {
+          toast.warning(res.data.message);
+        }
+      })
+      .catch((err) => toast.error('Có lỗi xảy ra!'));
+  }, []);
 
   return (
     <>
@@ -58,11 +75,20 @@ export default function UpdateHappeningDialog(props) {
           <Collapse in={shouldOpenSalaryeDialog} timeout="auto" unmountOnExit>
             <UpdateSalary item={item} />
           </Collapse>
+          <p
+            onClick={() => setOpenContractExtensionDialog(!shouldOpenContractExtensionDialog)}
+            className="collapse"
+          >
+            GIA HẠN HỢP ĐỒNG {shouldOpenContractExtensionDialog ? <ExpandLess /> : <ExpandMore />}
+          </p>
+          <Collapse in={shouldOpenContractExtensionDialog} timeout="auto" unmountOnExit>
+            <ContractExtensionDialog item={item} />
+          </Collapse>
           <p onClick={() => setOpenHistoryDialog(!shouldOpenHistoryDialog)} className="collapse">
             LỊCH SỬ CÔNG TÁC {shouldOpenHistoryDialog ? <ExpandLess /> : <ExpandMore />}
           </p>
           <Collapse in={shouldOpenHistoryDialog} timeout="auto" unmountOnExit>
-            <HistoryDialog item={item} />
+            <HistoryDialog list={listHistoryEmployee} />
           </Collapse>
         </DialogContent>
         <DialogActions>

@@ -89,8 +89,9 @@ export default function PromoteDialog(props) {
       languages: item?.id ? item?.languages : [],
       department: item?.id ? item?.department : null,
       positions: item?.id ? item?.positions : null,
+      titleRecruit: item?.id ? item?.titleRecruit : null,
       status: item?.id ? item?.status : null,
-      refusalReason: '',
+      // refusalReason: '',
     },
     enableReinitialize: true,
     validateOnChange: false,
@@ -98,7 +99,8 @@ export default function PromoteDialog(props) {
     validationSchema: Yup.object({
       department: Yup.object().nullable().required('Vui lòng chọn trường này'),
       positions: Yup.array().nullable().required('Vui lòng chọn trường này'),
-      refusalReason: Yup.string().nullable().required('Vui lòng chọn trường này'),
+      // refusalReason: Yup.string().nullable().required('Vui lòng chọn trường này'),
+      titleRecruit: Yup.string().nullable().required('Vui lòng nhập trường này'),
     }),
     onSubmit: (values) => {
       values.id = item?.id;
@@ -164,7 +166,7 @@ export default function PromoteDialog(props) {
             )}
           />
         </Grid>
-        <Grid item xs={12} md={12}>
+        {/* <Grid item xs={12} md={12}>
           <TextField
             label="Lý do"
             variant="outlined"
@@ -176,6 +178,18 @@ export default function PromoteDialog(props) {
             onChange={formik.handleChange}
             error={formik.errors.refusalReason && formik.touched.refusalReason}
             helperText={formik.errors.refusalReason}
+          />
+        </Grid> */}
+        <Grid item xs={6} md={6}>
+          <TextField
+            label="Vị trí làm việc"
+            variant="outlined"
+            fullWidth
+            name="titleRecruit"
+            value={formik.values?.titleRecruit}
+            onChange={formik.handleChange}
+            error={formik.errors.titleRecruit && formik.touched.titleRecruit}
+            helperText={formik.errors.titleRecruit}
           />
         </Grid>
         {item?.status === 12 && (
