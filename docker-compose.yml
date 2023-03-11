@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  frontend:
+    container_name: frontend
+    build:
+      context: ./FE
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+  backend:
+    container_name: backend
+    build:
+      context: ./BE
+      dockerfile: Dockerfile
+    ports:
+      - "8888:8888"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/ql_nhan_su?useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=123456
+    depends_on:
+      - mysql
+    networks:
+      - app-network
+  mysql:
+    container_name: mysql
+    image: mysql:8.0.28
+    ports:
+      - "3308:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: ql_nhan_su
+    networks:
+      - app-network
+
+networks:
+  app-network:
