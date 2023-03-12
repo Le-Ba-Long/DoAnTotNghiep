@@ -1,0 +1,1 @@
+{"version":3,"sources":["webpack://src/app/views/ApproveCadidate/Candidate.scss"],"names":[],"mappings":"AACE,kBACE,cAAA","file":"23.9b71aaf5.chunk.css","sourcesContent":[".font-15 {\r\n  textarea {\r\n    font-size: 15px;\r\n  }\r\n}\r\n"]}
