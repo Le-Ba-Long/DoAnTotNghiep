@@ -1,0 +1,1 @@
+{"version":3,"sources":["webpack://src/app/views/ProfileUser/ProfileUser.scss"],"names":[],"mappings":"AACE,UACE,cAAA","file":"32.59d40a49.chunk.css","sourcesContent":[".icon {\r\n  svg {\r\n    font-size: 50px;\r\n  }\r\n}\r\n"]}
